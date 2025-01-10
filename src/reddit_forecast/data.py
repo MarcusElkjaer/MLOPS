@@ -31,7 +31,7 @@ if __name__ == "__main__":
     import zipfile
     
     dataset = 'justinmiller/reddit-pennystock-data'
-    download_path = '../../data/raw'
+    download_path = 'data/raw'
 
     #check if the data is already downloaded
     os.system(f'kaggle datasets download -d {dataset} -p {download_path}')
@@ -40,6 +40,5 @@ if __name__ == "__main__":
     with zipfile.ZipFile(zip_path, 'r') as zip_ref:
         zip_ref.extractall(download_path)
     
+    #preprocess data
     
-
-    # typer.run(preprocess)
