@@ -1,6 +1,6 @@
 # reddit_forecast
 
-A short description of the project.
+We aim to conduct a sentiment analysis on the subreddit r/pennystocks. The goal is to evaluate and interpret the overall sentiment of posts and comments shared by the community. By analyzing the sentiment trends, we hope to gain insights into how users feel about specific stocks, investment strategies, and market conditions discussed in the subreddit.
 
 ## Project structure
 
