@@ -4,7 +4,7 @@ from transformers import pipeline
 import matplotlib.pyplot as plt
 
 # Load JSON
-file_path = "data/saps.json"
+file_path = "data/raw/saps.json"
 with open(file_path, 'r') as file:
     data = json.load(file)
 

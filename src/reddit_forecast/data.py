@@ -26,4 +26,19 @@ def preprocess(raw_data_path: Path, output_folder: Path) -> None:
 
 
 if __name__ == "__main__":
-    typer.run(preprocess)
+    #download data
+    import os
+    import zipfile
+    
+    dataset = 'justinmiller/reddit-pennystock-data'
+    download_path = 'data/raw'
+
+    #check if the data is already downloaded
+    os.system(f'kaggle datasets download -d {dataset} -p {download_path}')
+    
+    zip_path = f'{download_path}/{dataset.split("/")[1]}.zip'
+    with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+        zip_ref.extractall(download_path)
+    
+    #preprocess data
+    
