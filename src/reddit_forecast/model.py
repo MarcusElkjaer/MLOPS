@@ -3,7 +3,19 @@ import pandas as pd
 from transformers import pipeline
 import matplotlib.pyplot as plt
 
+# Load JSON
+file_path = "data/saps.json"
+with open(file_path, 'r') as file:
+    data = json.load(file)
 
+# Parse metadata for 'RobinHoodPennyStocks'
+metadata = data["RobinHoodPennyStocks"]["md"]
+post_data_meta = metadata["postData"]
+inter_keys = metadata["inter"]["keys"]
+intra_keys = metadata["intra"]["keys"]
+
+# Parse raw data for 'RobinHoodPennyStocks'
+raw_posts = data["RobinHoodPennyStocks"]["raw"]["postData"]
 
 posts_df = pd.DataFrame(raw_posts, columns=["ticker", "title", "text", "flair", "timestamp"])
 
