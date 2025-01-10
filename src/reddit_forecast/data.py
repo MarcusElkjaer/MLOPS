@@ -29,6 +29,7 @@ if __name__ == "__main__":
     #download data
     import os
     import zipfile
+    import kaggle
     
     dataset = 'justinmiller/reddit-pennystock-data'
     download_path = 'data/raw'
