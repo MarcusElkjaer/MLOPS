@@ -21,11 +21,20 @@ def analyze_sentiment(text: str) -> Tuple[str, float]:
 def apply_sentiment_analysis(input_path: str, output_path: str) -> None:
     """Apply sentiment analysis to preprocessed data."""
     df = pd.read_csv(input_path)
+
+    # Drop rows with missing or invalid text
+    df = df.dropna(subset=["text"])
+    df = df[df["text"].apply(lambda x: isinstance(x, str) and len(x.strip()) > 0)]
+
+    # Apply sentiment analysis
     df[["sentiment", "sentiment_score"]] = df["text"].apply(
         lambda text: pd.Series(analyze_sentiment(text))
     )
+
+    # Save cleaned and processed data
     df.to_csv(output_path, index=False)
     print(f"Sentiment analysis applied and saved to {output_path}")
+
 
 
 if __name__ == "__main__":
