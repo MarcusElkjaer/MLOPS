@@ -1,13 +1,21 @@
 from typing import Tuple
 import pandas as pd
 from transformers import pipeline
+import logging
+from typing import Tuple,Optional
 
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Initialize the sentiment analysis pipeline
-sentiment_analyzer = pipeline("sentiment-analysis", model="distilbert-base-uncased-finetuned-sst-2-english")
+sentiment_analyzer = pipeline(
+    "sentiment-analysis", 
+    model="distilbert-base-uncased-finetuned-sst-2-english"
+    )
 
 
-def analyze_sentiment(text: str) -> Tuple[str, float]:
+def analyze_sentiment(text: str) -> Tuple[Optional[str], Optional[float]]:
     """Analyze sentiment of the given text."""
     if pd.isnull(text) or not isinstance(text, str) or len(text.strip()) == 0:
         return None, None
@@ -15,6 +23,7 @@ def analyze_sentiment(text: str) -> Tuple[str, float]:
         result = sentiment_analyzer(text[:512])[0]
         return result['label'], result['score']
     except Exception as e:
+        logger.error(f"Error analyzing sentiment for text: {text}")
         return None, None
 
 
@@ -33,8 +42,7 @@ def apply_sentiment_analysis(input_path: str, output_path: str) -> None:
 
     # Save cleaned and processed data
     df.to_csv(output_path, index=False)
-    print(f"Sentiment analysis applied and saved to {output_path}")
-
+    logger.info(f"Processed data saved to: {output_path}")
 
 
 if __name__ == "__main__":
