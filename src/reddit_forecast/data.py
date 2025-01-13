@@ -2,22 +2,43 @@ from pathlib import Path
 import json
 import pandas as pd
 from torch.utils.data import Dataset
+from typing import Optional
+import typer
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 class MyDataset(Dataset):
     """My custom dataset."""
 
     def __init__(self, raw_data_path: Path) -> None:
-        self.data_path = raw_data_path
-        with open(raw_data_path / "preprocessed_data.csv", 'r') as file:
-            self.data = pd.read_csv(file)
+            """
+            Args:
+                raw_data_path: Path to the directory containing 'preprocessed_data.csv'.
+            """
+            self.data_path = raw_data_path
+            preprocessed_file = raw_data_path / "preprocessed_data.csv"
+            if not preprocessed_file.exists():
+                raise FileNotFoundError(f"Could not find {preprocessed_file}")
+
+            self.data = pd.read_csv(preprocessed_file)
 
     def __len__(self) -> int:
         """Return the length of the dataset."""
         return len(self.data)
 
     def __getitem__(self, index: int):
-        """Return a given sample from the dataset."""
+        """
+        Return a given sample from the dataset as a dictionary.
+
+        Args:
+            index: Index of the sample.
+
+        Returns:
+            A dictionary containing relevant fields from the dataset row.
+        """
         sample = self.data.iloc[index]
         return {
             "ticker": sample["ticker"],
@@ -28,12 +49,13 @@ class MyDataset(Dataset):
 
 
 def preprocess(raw_data_path: Path, output_folder: Path) -> None:
-    print("Preprocessing data...")
+    logger.info("Preprocessing data...")
     json_path = raw_data_path / "saps.json"
     if not json_path.exists():
         raise FileNotFoundError(f"File not found: {json_path}")
 
     # Load the raw JSON
+    logger.info(f"Loading data from {json_path}")
     with open(json_path, 'r') as file:
         raw_data = json.load(file)
 
@@ -41,14 +63,14 @@ def preprocess(raw_data_path: Path, output_folder: Path) -> None:
     posts = raw_data["RobinHoodPennyStocks"]["raw"]["postData"]
     df = pd.DataFrame(posts, columns=["ticker", "title", "text", "flair", "timestamp"])
 
-    # Example preprocessing: Drop missing values, clean text
+    # Drop missing values, clean text
     df.dropna(subset=["text"], inplace=True)
     df["text"] = df["text"].str.lower().str.replace(r"[^a-z\s]", "", regex=True)
 
     # Save the preprocessed data
     output_path = output_folder / "preprocessed_data.csv"
     df.to_csv(output_path, index=False)
-    print(f"Preprocessed data saved to {output_path}")
+    logger.info(f"Preprocessed data saved to {output_path}")
 
 
 if __name__ == "__main__":
@@ -57,8 +79,8 @@ if __name__ == "__main__":
     import subprocess
 
     dataset = 'justinmiller/reddit-pennystock-data'
-    raw_data_path = Path("data/raw")
-    processed_path = Path("data/processed")
+    raw_data_path: str = Path("data/raw")
+    processed_path: str = Path("data/processed")
 
     # Ensure directories exist
     raw_data_path.mkdir(parents=True, exist_ok=True)
