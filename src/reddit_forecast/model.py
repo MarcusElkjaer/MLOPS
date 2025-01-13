@@ -1,4 +1,5 @@
 import json
+from typing import Tuple
 import pandas as pd
 from transformers import pipeline
 import matplotlib.pyplot as plt
@@ -6,7 +7,7 @@ import matplotlib.pyplot as plt
 # Load JSON
 file_path = "data/raw/saps.json"
 with open(file_path, 'r') as file:
-    data = json.load(file)
+    data:dict = json.load(file)
 
 # Parse metadata for 'RobinHoodPennyStocks'
 metadata = data["RobinHoodPennyStocks"]["md"]
@@ -26,7 +27,7 @@ posts_df["intra_fin_data"] = posts_df.index.map(lambda x: intra_keys[x] if x < l
 
 sentiment_analyzer = pipeline("sentiment-analysis", model="distilbert-base-uncased-finetuned-sst-2-english")
 
-def analyze_sentiment(text):
+def analyze_sentiment(text: str) -> Tuple[str, float]:
     if pd.isnull(text) or not isinstance(text, str) or len(text.strip()) == 0:
         return None, None
     try:
