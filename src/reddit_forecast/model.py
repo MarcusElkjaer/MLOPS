@@ -1,33 +1,14 @@
-import json
 from typing import Tuple
 import pandas as pd
 from transformers import pipeline
-import matplotlib.pyplot as plt
-
-# Load JSON
-file_path = "data/raw/saps.json"
-with open(file_path, 'r') as file:
-    data:dict = json.load(file)
-
-# Parse metadata for 'RobinHoodPennyStocks'
-metadata = data["RobinHoodPennyStocks"]["md"]
-post_data_meta = metadata["postData"]
-inter_keys = metadata["inter"]["keys"]
-intra_keys = metadata["intra"]["keys"]
-
-# Parse raw data for 'RobinHoodPennyStocks'
-raw_posts = data["RobinHoodPennyStocks"]["raw"]["postData"]
-
-posts_df = pd.DataFrame(raw_posts, columns=["ticker", "title", "text", "flair", "timestamp"])
-
-# Add financial data placeholders
-posts_df["inter_fin_data"] = posts_df.index.map(lambda x: inter_keys[x] if x < len(inter_keys) else None)
-posts_df["intra_fin_data"] = posts_df.index.map(lambda x: intra_keys[x] if x < len(intra_keys) else None)
 
 
+# Initialize the sentiment analysis pipeline
 sentiment_analyzer = pipeline("sentiment-analysis", model="distilbert-base-uncased-finetuned-sst-2-english")
 
+
 def analyze_sentiment(text: str) -> Tuple[str, float]:
+    """Analyze sentiment of the given text."""
     if pd.isnull(text) or not isinstance(text, str) or len(text.strip()) == 0:
         return None, None
     try:
@@ -36,18 +17,18 @@ def analyze_sentiment(text: str) -> Tuple[str, float]:
     except Exception as e:
         return None, None
 
-posts_df[["sentiment", "sentiment_score"]] = posts_df["text"].apply(
-    lambda text: pd.Series(analyze_sentiment(text))
-)
+
+def apply_sentiment_analysis(input_path: str, output_path: str) -> None:
+    """Apply sentiment analysis to preprocessed data."""
+    df = pd.read_csv(input_path)
+    df[["sentiment", "sentiment_score"]] = df["text"].apply(
+        lambda text: pd.Series(analyze_sentiment(text))
+    )
+    df.to_csv(output_path, index=False)
+    print(f"Sentiment analysis applied and saved to {output_path}")
 
 
-# Save to CSV for further analysis
-posts_df.to_csv("models/processed_posts_with_sentiment.csv", index=False)
-print("Processed posts saved with sentiment analysis.")
-
-
-df = pd.read_csv("models/processed_posts_with_sentiment.csv")
-
-# Visualize sentiment distribution
-df["sentiment"].value_counts().plot(kind="bar", title="Sentiment Distribution")
-plt.show()
+if __name__ == "__main__":
+    input_path = "data/processed/preprocessed_data.csv"
+    output_path = "models/processed_posts_with_sentiment.csv"
+    apply_sentiment_analysis(input_path, output_path)
