@@ -14,39 +14,22 @@ logger = logging.getLogger(__name__)
 
 
 class MyDataset(Dataset):
-    def __init__(self, csv_path, transform=None):
-        """
-        :param csv_path: Full path to the CSV file
-                         (e.g. data/processed/preprocessed_data.csv)
-        :param transform: Optional transform to apply to each row dictionary
-        """
-        self.csv_path = Path(csv_path)  # make sure it's a Path object
-        self.transform = transform
-
-        # Check that it's actually a file, not a directory
+    def __init__(self, processed_dir, transform=None):
+        # Build the file path from a directory
+        self.csv_path = Path(processed_dir) / "preprocessed_data.csv"
         if not self.csv_path.is_file():
             raise FileNotFoundError(f"{self.csv_path} not found or is not a file.")
 
-        # Read the entire CSV at once
+        self.transform = transform
         self.df = pd.read_csv(self.csv_path)
 
     def __len__(self):
         return len(self.df)
 
     def __getitem__(self, idx):
-        # Check bounds
         if idx >= len(self.df):
-            raise IndexError(
-                f"Index {idx} out of range for dataset of size {len(self.df)}"
-            )
-
-        # Extract the row as a dictionary of {column_name: value}
+            raise IndexError(...)
         row_dict = self.df.iloc[idx].to_dict()
-
-        # Apply any transform if needed
-        if self.transform:
-            row_dict = self.transform(row_dict)
-
         return row_dict
 
 
