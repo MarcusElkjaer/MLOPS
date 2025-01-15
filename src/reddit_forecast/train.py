@@ -6,7 +6,10 @@ import torch.optim as optim
 from torch.cuda.amp import GradScaler, autocast
 import pandas as pd
 from torch.utils.data import Dataset
+import logging
 
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 class SentimentDataset(Dataset):
     def __init__(self, file_path: str, tokenizer, max_length: int = 512):
@@ -41,24 +44,24 @@ class SentimentDataset(Dataset):
 
 
 def train():
-    print("Initializing tokenizer and model...")
+    logger.info("Training sentiment analysis model...")
     tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased")
     model = AutoModelForSequenceClassification.from_pretrained(
         "distilbert-base-uncased", num_labels=2
     )
     device = "cuda" if torch.cuda.is_available() else "cpu"
     model.to(device)
-    print(f"Using device: {device}")
+    logger.info(f"Model loaded on {device}.")
 
     # Load dataset and dataloader
-    print("Loading dataset...")
+    logger.info("Loading dataset and initializing dataloader...")
     dataset = SentimentDataset("models/processed_posts_with_sentiment.csv", tokenizer)
-    print(f"Dataset loaded with {len(dataset)} samples.")
+    logger.info(f"Dataset loaded with {len(dataset)} samples.")
     train_loader = DataLoader(dataset, batch_size=32, shuffle=True, num_workers=4, pin_memory=True)
-    print("Dataloader initialized.")
+    logger.info("Dataloader initialized.")
 
     # Define loss function and optimizer
-    print("Initializing optimizer and loss function...")
+    logger.info("Defining loss function and optimizer...")
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.AdamW(model.parameters(), lr=2e-5)
     scaler = GradScaler()
@@ -66,12 +69,12 @@ def train():
     # Training loop
     epochs = 3
     accumulation_steps = 2  # Accumulate gradients over multiple steps
-    print("Starting training...")
+    logger.info(f"Training model for {epochs} epochs...")
     for epoch in range(epochs):
         model.train()
         total_loss = 0
         for batch_idx, batch in enumerate(train_loader):
-            print(f"Processing batch {batch_idx + 1}...")
+            logger.info(f"Processing batch {batch_idx + 1}...")
             input_ids = batch["input_ids"].to(device)
             attention_mask = batch["attention_mask"].to(device)
             labels = batch["label"].to(device)
@@ -91,13 +94,13 @@ def train():
 
             total_loss += loss.item() * accumulation_steps
 
-        print(f"Epoch {epoch + 1}/{epochs}, Loss: {total_loss / len(train_loader)}")
+        logger.info(f"Epoch {epoch + 1}/{epochs}, Loss: {total_loss / len(train_loader)}")
 
     # Save the fine-tuned model
-    print("Saving fine-tuned model...")
+    logger.info("Saving fine-tuned model and tokenizer...")
     model.save_pretrained("models/fine_tuned_distilbert")
     tokenizer.save_pretrained("models/fine_tuned_distilbert")
-    print("Model and tokenizer saved!")
+    logger.info("Model and tokenizer saved!")
 
 
 if __name__ == "__main__":

@@ -1,6 +1,7 @@
 [build-system]
-requires = ["setuptools", "wheel"]
+requires = ["setuptools", "wheel", "pydantic-core>=2.0.0"]  # Merge the dependencies
 build-backend = "setuptools.build_meta"
+
 
 [project]
 name = "reddit_forecast"
