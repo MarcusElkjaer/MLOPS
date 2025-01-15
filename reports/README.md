@@ -72,13 +72,8 @@ will check the repositories and the code to verify your answers.
 
 ### Week 2
 
-<<<<<<< HEAD
-* [x] Write unit tests related to the data part of your code (M16)
-* [x] Write unit tests related to model construction and or model training (M16)
-=======
 * [y] Write unit tests related to the data part of your code (M16)
 * [y] Write unit tests related to model construction and or model training (M16)
->>>>>>> 870b0bff6d3e44c6b1f852892595089f1b79998a
 * [ ] Calculate the code coverage (M16)
 * [y] Get some continuous integration running on the GitHub repository (M17)
 * [ ] Add caching and multi-os/python/pytorch testing to your continuous integration (M17)
