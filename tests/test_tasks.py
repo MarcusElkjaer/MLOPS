@@ -83,8 +83,8 @@ def test_run_test(mock_context):
     """Test test task."""
     run_test(mock_context)
     expected_calls = [
-        call("coverage run -m pytest tests/", echo=True, pty=not WINDOWS),
-        call("coverage report -m", echo=True, pty=not WINDOWS),
+        call("PYTHONPATH=src coverage run -m pytest", echo=True, pty=not WINDOWS),
+        call("coverage report", echo=True, pty=not WINDOWS),
     ]
     mock_context.run.assert_has_calls(expected_calls)
 
