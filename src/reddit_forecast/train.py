@@ -3,6 +3,7 @@ from torch.utils.data import DataLoader
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import torch.nn as nn
 import torch.optim as optim
+from torch.cuda.amp import GradScaler, autocast
 import pandas as pd
 from torch.utils.data import Dataset
 
@@ -39,7 +40,6 @@ class SentimentDataset(Dataset):
         }
 
 
-
 def train():
     print("Initializing tokenizer and model...")
     tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased")
@@ -54,16 +54,18 @@ def train():
     print("Loading dataset...")
     dataset = SentimentDataset("models/processed_posts_with_sentiment.csv", tokenizer)
     print(f"Dataset loaded with {len(dataset)} samples.")
-    train_loader = DataLoader(dataset, batch_size=16, shuffle=True)
+    train_loader = DataLoader(dataset, batch_size=32, shuffle=True, num_workers=4, pin_memory=True)
     print("Dataloader initialized.")
 
     # Define loss function and optimizer
     print("Initializing optimizer and loss function...")
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(model.parameters(), lr=1e-5)
+    optimizer = optim.AdamW(model.parameters(), lr=2e-5)
+    scaler = GradScaler()
 
     # Training loop
     epochs = 3
+    accumulation_steps = 2  # Accumulate gradients over multiple steps
     print("Starting training...")
     for epoch in range(epochs):
         model.train()
@@ -75,12 +77,19 @@ def train():
             labels = batch["label"].to(device)
 
             optimizer.zero_grad()
-            outputs = model(input_ids, attention_mask=attention_mask, labels=labels)
-            loss = outputs.loss
-            loss.backward()
-            optimizer.step()
+            with autocast():
+                outputs = model(input_ids, attention_mask=attention_mask, labels=labels)
+                loss = outputs.loss / accumulation_steps  # Normalize loss for accumulation
 
-            total_loss += loss.item()
+            scaler.scale(loss).backward()
+
+            # Perform optimizer step after accumulation_steps
+            if (batch_idx + 1) % accumulation_steps == 0 or (batch_idx + 1) == len(train_loader):
+                scaler.step(optimizer)
+                scaler.update()
+                optimizer.zero_grad()
+
+            total_loss += loss.item() * accumulation_steps
 
         print(f"Epoch {epoch + 1}/{epochs}, Loss: {total_loss / len(train_loader)}")
 
@@ -89,7 +98,6 @@ def train():
     model.save_pretrained("models/fine_tuned_distilbert")
     tokenizer.save_pretrained("models/fine_tuned_distilbert")
     print("Model and tokenizer saved!")
-
 
 
 if __name__ == "__main__":
