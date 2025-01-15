@@ -73,3 +73,16 @@ jobs:
         with:
           name: coverage-report
           path: .coverage
+
+      - name: Run tests & coverage (Windows)
+        if: matrix.operating-system == 'windows-latest'
+        run: |
+          $env:PYTHONPATH="src"
+          coverage run -m pytest tests/ --strict-markers --disable-warnings
+          coverage report -m
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-report
+          path: .coverage
