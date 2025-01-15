@@ -33,6 +33,9 @@ jobs:
           pip install -r requirements.txt
           pip list
 
+      - name: Install local package
+        run: |
+          pip install -e ./src
 
       - name: Run tests & coverage
         run: |
