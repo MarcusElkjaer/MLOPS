@@ -38,8 +38,8 @@ pillow==11.1.0
 pluggy==0.13.1
 propcache==0.2.1
 py==1.11.0
-pydantic==2.0.1  # Adjusted for compatibility
-pydantic_core==2.6.3
+pydantic==2.0.1
+pydantic-core>=2.0.2  # Allow pip to select a compatible version
 Pygments==2.19.1
 pyparsing==3.2.1
 pytest==6.2.4
