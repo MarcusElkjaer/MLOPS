@@ -35,7 +35,8 @@ jobs:
 
       - name: Install local package
         run: |
-          pip install -e ./src
+          pip install -e .
+
 
       - name: Run tests & coverage
         run: |
