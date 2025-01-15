@@ -14,39 +14,40 @@ logger = logging.getLogger(__name__)
 
 
 class MyDataset(Dataset):
-    def __init__(self, processed_dir, transform=None):
+    def __init__(self, csv_path, transform=None):
         """
-        :param processed_dir: The directory that contains 'preprocessed_data.csv'
-        :param transform: Optional transform to apply to each row of data
+        :param csv_path: Full path to the CSV file
+                         (e.g. data/processed/preprocessed_data.csv)
+        :param transform: Optional transform to apply to each row dictionary
         """
-        # Build the full CSV path
-        csv_path = Path(processed_dir) / "preprocessed_data.csv"
-
-        # Ensure that the file actually exists
-        if not csv_path.is_file():
-            raise FileNotFoundError(f"{csv_path} not found or is not a file.")
-
-        self.file_path = pd.read_csv(csv_path)
+        self.csv_path = Path(csv_path)  # make sure it's a Path object
         self.transform = transform
 
-        # Load the first column just to count how many rows there are
-        self.total_rows = len(pd.read_csv(self.file_path, usecols=[0]))
+        # Check that it's actually a file, not a directory
+        if not self.csv_path.is_file():
+            raise FileNotFoundError(f"{self.csv_path} not found or is not a file.")
+
+        # Read the entire CSV at once
+        self.df = pd.read_csv(self.csv_path)
 
     def __len__(self):
-        return self.total_rows
+        return len(self.df)
 
     def __getitem__(self, idx):
-        # Pandas reads only the row at the given index (skiprows=idx+1)
-        row = pd.read_csv(self.file_path, skiprows=idx + 1, nrows=1).iloc[0]
+        # Check bounds
+        if idx >= len(self.df):
+            raise IndexError(
+                f"Index {idx} out of range for dataset of size {len(self.df)}"
+            )
 
-        # By convention here, the last column is treated as the label
-        data = torch.tensor(row[:-1].values, dtype=torch.float32)
-        label = torch.tensor(row[-1], dtype=torch.float32)
+        # Extract the row as a dictionary of {column_name: value}
+        row_dict = self.df.iloc[idx].to_dict()
 
+        # Apply any transform if needed
         if self.transform:
-            data = self.transform(data)
+            row_dict = self.transform(row_dict)
 
-        return data, label
+        return row_dict
 
 
 def dataset_statistics(processed_path: Path):
