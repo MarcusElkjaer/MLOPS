@@ -7,7 +7,7 @@ on:
 
 jobs:
   test:
-    runs-on: self-hosted
+    runs-on: ${{ matrix.operating-system }}
     strategy:
       matrix:
         operating-system: ["ubuntu-latest", "windows-latest", "macos-latest"]
@@ -33,6 +33,9 @@ jobs:
       - name: Install local package
         run: |
           pip install -e .
+      - name: Run linting
+        run: |
+          ruff check src tests
 
       # MacOS-specific memory optimization
       - name: Optimize memory for macOS
