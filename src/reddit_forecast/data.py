@@ -26,7 +26,7 @@ class MyDataset(Dataset):
         if not csv_path.is_file():
             raise FileNotFoundError(f"{csv_path} not found or is not a file.")
 
-        self.file_path = csv_path
+        self.file_path = pd.read_csv(csv_path)
         self.transform = transform
 
         # Load the first column just to count how many rows there are
