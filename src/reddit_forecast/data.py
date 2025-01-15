@@ -13,7 +13,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-class PandasCSVDataset(Dataset):
+class MyDataset(Dataset):
     def __init__(self, file_path, transform=None):
         self.file_path = file_path
         self.transform = transform
