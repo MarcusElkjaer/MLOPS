@@ -4,48 +4,37 @@ import pandas as pd
 from torch.utils.data import Dataset
 from typing import Optional
 import typer
+import torch
 import logging
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-class MyDataset(Dataset):
-    """My custom dataset."""
 
-    def __init__(self, raw_data_path: Path) -> None:
-            """
-            Args:
-                raw_data_path: Path to the directory containing 'preprocessed_data.csv'.
-            """
-            self.data_path = raw_data_path
-            preprocessed_file = raw_data_path / "preprocessed_data.csv"
-            if not preprocessed_file.exists():
-                raise FileNotFoundError(f"Could not find {preprocessed_file}")
+class PandasCSVDataset(Dataset):
+    def __init__(self, file_path, transform=None):
+        self.file_path = file_path
+        self.transform = transform
+        
+        # Load the first few rows to calculate the total rows (efficiently with Pandas)
+        self.total_rows = len(pd.read_csv(file_path, usecols=[0]))  # Only read the first column for counting
 
-            self.data = pd.read_csv(preprocessed_file)
+    def __len__(self):
+        return self.total_rows
 
-    def __len__(self) -> int:
-        """Return the length of the dataset."""
-        return len(self.data)
+    def __getitem__(self, idx):
+        # Use pandas to read a specific row
+        row = pd.read_csv(self.file_path, skiprows=idx + 1, nrows=1).iloc[0]
 
-    def __getitem__(self, index: int):
-        """
-        Return a given sample from the dataset as a dictionary.
+        # Assume the last column is the label
+        data = torch.tensor(row[:-1].values, dtype=torch.float32)
+        label = torch.tensor(row[-1], dtype=torch.float32)
 
-        Args:
-            index: Index of the sample.
+        if self.transform:
+            data = self.transform(data)
 
-        Returns:
-            A dictionary containing relevant fields from the dataset row.
-        """
-        sample = self.data.iloc[index]
-        return {
-            "ticker": sample["ticker"],
-            "text": sample["text"],
-            "flair": sample["flair"],
-            "timestamp": sample["timestamp"],
-        }
+        return data, label
 
 
 def preprocess(raw_data_path: Path, output_folder: Path) -> None:
@@ -82,12 +71,10 @@ if __name__ == "__main__":
     raw_data_path: str = Path("data/raw")
     processed_path: str = Path("data/processed")
 
-
-
-
     # Ensure directories exist
     raw_data_path.mkdir(parents=True, exist_ok=True)
     processed_path.mkdir(parents=True, exist_ok=True)
+
     zip_path = raw_data_path / f'{dataset.split("/")[1]}.zip'
 
     # Download dataset if not already downloaded
