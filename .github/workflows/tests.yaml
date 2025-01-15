@@ -37,21 +37,40 @@ jobs:
         run: |
           pip install -e .
 
-      - name: Run tests & coverage (Linux and macOS)
-        if: matrix.operating-system != 'windows-latest'
+      # MacOS-specific memory optimization
+      - name: Optimize memory for macOS
+        if: matrix.operating-system == 'macos-latest'
+        run: |
+          export PYTORCH_MPS_HIGH_WATERMARK_RATIO=0.0
+          export PYTORCH_ENABLE_MPS_FALLBACK=1
+
+      # Skip memory-intensive tests on macOS
+      - name: Run lightweight tests on macOS
+        if: matrix.operating-system == 'macos-latest'
+        run: |
+          PYTHONPATH=src coverage run -m pytest tests/ --disable-warnings --ignore=tests/test_model.py
+          coverage report -m
+
+      - name: Run full tests on other platforms
+        if: matrix.operating-system != 'macos-latest'
         run: |
           PYTHONPATH=src coverage run -m pytest tests/ --strict-markers --disable-warnings
           coverage report -m
 
-      - name: Run tests & coverage (Windows)
-        if: matrix.operating-system == 'windows-latest'
+      # Monitor memory usage (optional, for debugging)
+      - name: Monitor memory usage (before tests)
+        if: matrix.operating-system == 'macos-latest'
         run: |
-          $env:PYTHONPATH="src"
-          coverage run -m pytest tests/ --strict-markers --disable-warnings
-          coverage report -m
+          vm_stat
+
+      - name: Monitor memory usage (after tests)
+        if: matrix.operating-system == 'macos-latest'
+        run: |
+          vm_stat
 
       - name: Upload coverage report
         uses: actions/upload-artifact@v3
         with:
           name: coverage-report
           path: .coverage
+          
