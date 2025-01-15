@@ -13,14 +13,15 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-
 class PandasCSVDataset(Dataset):
     def __init__(self, file_path, transform=None):
         self.file_path = file_path
         self.transform = transform
-        
+
         # Load the first few rows to calculate the total rows (efficiently with Pandas)
-        self.total_rows = len(pd.read_csv(file_path, usecols=[0]))  # Only read the first column for counting
+        self.total_rows = len(
+            pd.read_csv(file_path, usecols=[0])
+        )  # Only read the first column for counting
 
     def __len__(self):
         return self.total_rows
@@ -39,7 +40,7 @@ class PandasCSVDataset(Dataset):
         return data, label
 
 
-def data_statistics(processed_path: Path):
+def dataset_statistics(processed_path: Path):
     """Generate and save statistics about the dataset."""
     preprocessed_file = processed_path / "preprocessed_data.csv"
     if not preprocessed_file.exists():
