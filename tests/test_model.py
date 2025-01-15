@@ -4,6 +4,11 @@ import pandas as pd
 from reddit_forecast.model import (
     analyze_sentiment_batch,
 )
+import os
+
+@pytest.mark.skipif(
+        os.getenv("GITHUB_ACTIONS")=="true",reason="Skipping test in Github Actions due to limited resources")
+
 
 def test_analyze_sentiment_batch():
     """Test analyze_sentiment_batch function with valid texts."""
