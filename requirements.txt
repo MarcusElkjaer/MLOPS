@@ -67,3 +67,5 @@ tzdata==2024.2
 urllib3==2.3.0
 webencodings==0.5.1
 yarl==1.18.3
+coverage=7.6.10
+
