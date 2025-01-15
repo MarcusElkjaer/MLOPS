@@ -10,13 +10,13 @@ from tqdm import tqdm
 # from sklearn.model_selection import train_test_split
 # from torch.utils.data import Subset
 
+
 class SentimentDataset(Dataset):
     def __init__(self, file_path, tokenizer, max_length=128):
         self.data = pd.read_csv(file_path, usecols=["Sentence", "Sentiment"])
         self.tokenizer = tokenizer
         self.max_length = max_length
         self.label_map = {"positive": 1.0, "negative": 0.0, "neutral": 0.5}
-
 
     def __len__(self):
         return len(self.data)
@@ -44,12 +44,18 @@ class SentimentDataset(Dataset):
             "label": torch.tensor(label, dtype=torch.long),
         }
 
+
 def train():
     # logger.info("Training sentiment analysis model...")
     tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased")
-    model = AutoModelForSequenceClassification.from_pretrained("distilbert-base-uncased")
-    model.classifier = nn.Linear(model.config.hidden_size, 1)  # Single output for regression
+    model = AutoModelForSequenceClassification.from_pretrained(
+        "distilbert-base-uncased"
+    )
+    model.classifier = nn.Linear(
+        model.config.hidden_size, 1
+    )  # Single output for regression
     device = "cuda" if torch.cuda.is_available() else "cpu"
+
     print(f"Model loaded on {device}.")
     model.to(device)
     # logger.info(f"Model loaded on {device}.")
@@ -115,8 +121,9 @@ def train():
             mse_loss += criterion(logits, labels.float()).item()
 
     print(f"Test MSE Loss: {mse_loss / len(test_loader):.4f}")
-    #save model
+    # save model
     model.save_pretrained("models/sentiment_model_finetuned")
+
 
 if __name__ == "__main__":
     train()
