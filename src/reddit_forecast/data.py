@@ -82,10 +82,12 @@ if __name__ == "__main__":
     raw_data_path: str = Path("data/raw")
     processed_path: str = Path("data/processed")
 
+
+
+
     # Ensure directories exist
     raw_data_path.mkdir(parents=True, exist_ok=True)
     processed_path.mkdir(parents=True, exist_ok=True)
-
     zip_path = raw_data_path / f'{dataset.split("/")[1]}.zip'
 
     # Download dataset if not already downloaded
