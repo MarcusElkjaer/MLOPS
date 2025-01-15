@@ -60,7 +60,8 @@ def dataset_statistics(processed_path: Path):
     plt.close()
 
     # Write statistics to a markdown file
-    with open("statistics_report.md", "w") as report:
+    output_file = processed_path / "statistics_report.md"
+    with open(output_file, "w") as report:
         report.write(f"# Dataset Statistics\n\n")
         report.write(f"Number of samples: {num_samples}\n")
         report.write(f"Number of unique tickers: {num_unique_tickers}\n\n")
