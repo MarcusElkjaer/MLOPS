@@ -45,13 +45,14 @@ class SentimentDataset(Dataset):
         }
 
 def train():
-    print("Initializing tokenizer and model...")
+    # logger.info("Training sentiment analysis model...")
     tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased")
     model = AutoModelForSequenceClassification.from_pretrained("distilbert-base-uncased")
     model.classifier = nn.Linear(model.config.hidden_size, 1)  # Single output for regression
     device = "cuda" if torch.cuda.is_available() else "cpu"
+    print(f"Model loaded on {device}.")
     model.to(device)
-    print(f"Using device: {device}")
+    # logger.info(f"Model loaded on {device}.")
 
     # Load dataset
     print("Loading dataset...")
@@ -114,6 +115,8 @@ def train():
             mse_loss += criterion(logits, labels.float()).item()
 
     print(f"Test MSE Loss: {mse_loss / len(test_loader):.4f}")
+    #save model
+    model.save_pretrained("models/sentiment_model_finetuned")
 
 if __name__ == "__main__":
     train()

@@ -1,6 +1,7 @@
 [build-system]
-requires = ["setuptools"]
+requires = ["setuptools", "wheel", "pydantic-core>=2.0.0"]  # Merge the dependencies
 build-backend = "setuptools.build_meta"
+
 
 [project]
 name = "reddit_forecast"
@@ -18,6 +19,10 @@ classifiers = [
 readme = "README.md"
 requires-python = ">=3.11"
 dynamic = ["dependencies", "optional-dependencies"]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+packages = ["reddit_forecast"]
 
 [tool.setuptools.dynamic]
 dependencies = {file = ["requirements.txt"]}

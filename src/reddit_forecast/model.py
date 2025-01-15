@@ -16,16 +16,17 @@ sentiment_analyzer = pipeline(
     model="distilbert-base-uncased-finetuned-sst-2-english")
 
 
-def analyze_sentiment(text: str) -> Tuple[str, float]:
-    """Analyze sentiment of the given text."""
-    if pd.isnull(text) or not isinstance(text, str) or len(text.strip()) == 0:
-        return None, None
+def analyze_sentiment_batch(texts: list[str]) -> list[Tuple[Optional[str], Optional[float]]]:
+    """Analyze sentiment for a batch of texts."""
+    results = []
     try:
-        result = sentiment_analyzer(text[:512])[0]
-        return result['label'], result['score']
+        responses = sentiment_analyzer(texts, truncation=True, padding=True)
+        for response in responses:
+            results.append((response['label'], response['score']))
     except Exception as e:
-        logger.error(f"Failed to analyze sentiment for text: {text}")
-        return None, None
+        logger.error(f"Failed to analyze sentiment for batch. Error: {e}")
+        results = [(None, None)] * len(texts)
+    return results
 
 
 def apply_sentiment_analysis(input_path: str, output_path: str) -> None:
@@ -36,10 +37,15 @@ def apply_sentiment_analysis(input_path: str, output_path: str) -> None:
     df = df.dropna(subset=["text"])
     df = df[df["text"].apply(lambda x: isinstance(x, str) and len(x.strip()) > 0)]
 
-    # Apply sentiment analysis
-    df[["sentiment", "sentiment_score"]] = df["text"].apply(
-        lambda text: pd.Series(analyze_sentiment(text))
-    )
+    # Process in batches
+    batch_size = 32
+    sentiments = []
+    for i in range(0, len(df), batch_size):
+        batch_texts = df["text"].iloc[i:i + batch_size].tolist()
+        sentiments.extend(analyze_sentiment_batch(batch_texts))
+
+    # Add sentiment and sentiment score
+    df[["sentiment", "sentiment_score"]] = pd.DataFrame(sentiments)
 
     # Save cleaned and processed data
     df.to_csv(output_path, index=False)

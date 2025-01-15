@@ -1,12 +1,9 @@
 name: Unit Tests
-
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   pull_request:
-    branches:
-      - main
+    branches: [main]
 
 jobs:
   test:
@@ -14,7 +11,8 @@ jobs:
     strategy:
       matrix:
         operating-system: ["ubuntu-latest", "windows-latest", "macos-latest"]
-        python-version: ["3.12", "3.11"]
+        python-version: ["3.11"]
+
 
     steps:
       - name: Checkout code
@@ -24,7 +22,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-          cache: 'pip'
+          cache: pip
           cache-dependency-path: requirements.txt
 
       - name: Install dependencies
@@ -35,14 +33,53 @@ jobs:
 
       - name: Install local package
         run: |
-          pip install -e ./src
-
-      - name: Run tests & coverage
+          pip install -e .
+      - name: Run linting
         run: |
+          ruff check src tests --fix
+
+      # MacOS-specific memory optimization
+      - name: Optimize memory for macOS
+        if: matrix.operating-system == 'macos-latest'
+        run: |
+          export PYTORCH_MPS_HIGH_WATERMARK_RATIO=0.0
+          export PYTORCH_ENABLE_MPS_FALLBACK=1
+
+      # Skip memory-intensive tests on macOS
+      - name: Run lightweight tests on macOS
+        if: matrix.operating-system == 'macos-latest'
+        run: |
+          PYTHONPATH=src coverage run -m pytest tests/ --disable-warnings --ignore=tests/test_model.py
+          coverage report -m
+
+      # Full tests on non-macOS (Ubuntu)
+      - name: Run full tests on Ubuntu
+        if: matrix.operating-system == 'ubuntu-latest'
+        run: |
+          PYTHONPATH=src coverage run -m pytest tests/ --strict-markers --disable-warnings
+          coverage report -m
+
+      # Full tests on Windows (using PowerShell syntax to set env var)
+      - name: Run full tests on Windows
+        if: matrix.operating-system == 'windows-latest'
+        run: |
+          $Env:PYTHONPATH = "src"
           coverage run -m pytest tests/ --strict-markers --disable-warnings
           coverage report -m
-          - name: Upload coverage report
-          uses: actions/upload-artifact@v3
-          with:
-            name: coverage-report
-            path: .coverage
+
+      # Monitor memory usage (optional, for debugging)
+      - name: Monitor memory usage (before tests)
+        if: matrix.operating-system == 'macos-latest'
+        run: |
+          vm_stat
+
+      - name: Monitor memory usage (after tests)
+        if: matrix.operating-system == 'macos-latest'
+        run: |
+          vm_stat
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-report
+          path: .coverage
