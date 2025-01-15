@@ -181,3 +181,6 @@ data/raw/reddit-pennystock-data.zip
 models/processed_posts_with_sentiment.csv
 data/raw/data.csv
 data/raw/financial-sentiment-analysis.zip
+
+#ignore models folder
+models
