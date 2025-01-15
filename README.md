@@ -53,3 +53,9 @@ The directory structure of the project looks like this:
 Created using [mlops_template](https://github.com/SkafteNicki/mlops_template),
 a [cookiecutter template](https://github.com/cookiecutter/cookiecutter) for getting
 started with Machine Learning Operations (MLOps).
+
+
+
+# Run profiling and visualize
+#python -m cProfile -o profile_output.prof your_script.py
+#snakeviz profile_output.prof
