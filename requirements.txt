@@ -69,4 +69,4 @@ webencodings==0.5.1
 yarl==1.18.3
 coverage==7.6.10
 ruff
-
+pre-commit
