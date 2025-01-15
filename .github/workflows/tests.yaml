@@ -2,11 +2,9 @@ name: Unit Tests
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   pull_request:
-    branches:
-      - main
+    branches: [main]
 
 jobs:
   test:
@@ -24,7 +22,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-          cache: 'pip'
+          cache: pip
           cache-dependency-path: requirements.txt
 
       - name: Install dependencies
@@ -51,10 +49,19 @@ jobs:
           PYTHONPATH=src coverage run -m pytest tests/ --disable-warnings --ignore=tests/test_model.py
           coverage report -m
 
-      - name: Run full tests on other platforms
-        if: matrix.operating-system != 'macos-latest'
+      # Full tests on non-macOS (Ubuntu)
+      - name: Run full tests on Ubuntu
+        if: matrix.operating-system == 'ubuntu-latest'
         run: |
           PYTHONPATH=src coverage run -m pytest tests/ --strict-markers --disable-warnings
+          coverage report -m
+
+      # Full tests on Windows (using PowerShell syntax to set env var)
+      - name: Run full tests on Windows
+        if: matrix.operating-system == 'windows-latest'
+        run: |
+          $Env:PYTHONPATH = "src"
+          coverage run -m pytest tests/ --strict-markers --disable-warnings
           coverage report -m
 
       # Monitor memory usage (optional, for debugging)
@@ -73,4 +80,3 @@ jobs:
         with:
           name: coverage-report
           path: .coverage
-          
