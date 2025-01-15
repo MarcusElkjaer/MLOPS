@@ -17,9 +17,7 @@ def test_my_dataset_initialization():
         }
     )
 
-    mock_path = (
-        Path("data/processed") / "preprocessed_data.csv"
-    )  # point to the actual CSV
+    mock_path = Path("data/processed") / "preprocessed_data.csv"
     with patch("pandas.read_csv", return_value=mock_data):
         dataset = MyDataset(mock_path)
 
