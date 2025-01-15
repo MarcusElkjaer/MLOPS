@@ -114,3 +114,25 @@ if __name__ == "__main__":
         preprocess(raw_data_path, processed_path)
     else:
         print(f"Preprocessed data already exists in {processed_path}.")
+
+    # Download additional dataset if not already downloaded
+    additional_dataset = 'sbhatti/financial-sentiment-analysis'
+    additional_zip_path = raw_data_path / f'{additional_dataset.split("/")[1]}.zip'
+
+    if not additional_zip_path.exists():
+        print("Downloading additional dataset...")
+        subprocess.run(
+            ["kaggle", "datasets", "download", "-d", additional_dataset, "-p", str(raw_data_path)],
+            check=True
+        )
+    else:
+        print("Additional dataset already downloaded.")
+
+    # Extract additional dataset if not already extracted
+    additional_extracted_folder = raw_data_path / additional_dataset.split("/")[1]
+    if not additional_extracted_folder.exists():
+        print("Extracting additional dataset...")
+        with zipfile.ZipFile(additional_zip_path, 'r') as zip_ref:
+            zip_ref.extractall(raw_data_path)
+    else:
+        print("Additional dataset already extracted.")
