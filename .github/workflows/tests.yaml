@@ -35,7 +35,7 @@ jobs:
           pip install -e .
       - name: Run linting
         run: |
-          ruff check src tests
+          ruff check src tests --fix
 
       # MacOS-specific memory optimization
       - name: Optimize memory for macOS
