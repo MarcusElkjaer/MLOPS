@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.testclient import TestClient
 from reddit_forecast.model import analyze_sentiment_batch
 from http import HTTPStatus
 import praw
@@ -13,7 +14,7 @@ load_dotenv()
 reddit = praw.Reddit(
     client_id=os.getenv('REDDIT_CLIENT_ID'),
     client_secret=os.getenv('REDDIT_CLIENT_SECRET'),
-    user_agent=os.getenv('REDDIT_USER_AGENT')
+    user_agent= "reddit_forecast"
 )
 
 def get_last_month_posts(subreddit_name: str, search_term: str):
@@ -44,6 +45,7 @@ def analyze_posts_sentiment(posts):
     return posts
 
 app = FastAPI()
+test_client = TestClient(app)
 
 @app.get("/")
 def read_root():
@@ -51,7 +53,7 @@ def read_root():
 
 @app.get("/analyze_sentiment")
 def analyze_sentiment(text: str):
-    return analyze_sentiment_batch([text])
+    return analyze_sentiment_batch([text])[0]
 
 @app.get("/get_last_month_posts")
 def get_last_month_posts_endpoint(search_term: str, subreddit: str = "wallstreetbets"):

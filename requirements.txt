@@ -26,3 +26,4 @@ tabulate
 fastapi
 uvicorn
 python-dotenv
+httpx
