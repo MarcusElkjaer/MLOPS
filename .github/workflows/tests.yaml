@@ -49,7 +49,7 @@ jobs:
       - name: Run lightweight tests on macOS
         if: matrix.operating-system == 'macos-latest'
         run: |
-          PYTHONPATH=src coverage run -m pytest tests/ --disable-warnings --ignore=tests/test_model.py
+          PYTHONPATH=src coverage run -m pytest tests/ --disable-warnings --ignore=tests/test_model.py --ignore=tests/test_api.py
           coverage report -m
 
       # Full tests on non-macOS (Ubuntu)
