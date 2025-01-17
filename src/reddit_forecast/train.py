@@ -1,18 +1,12 @@
 import torch
-from torch.utils.data import DataLoader
-from transformers import AutoTokenizer, AutoModelForSequenceClassification
+from torch.utils.data import DataLoader, random_split
+from transformers import AutoTokenizer, AutoModel
 import torch.nn as nn
-import torch.optim as optim
+import pytorch_lightning as pl
+import optuna
+from optuna.storages import RDBStorage
 import pandas as pd
-from torch.utils.data import Dataset
-from tqdm import tqdm
-from reddit_forecast.visualize import visualize
-from evaluate import evaluate
-
-
-# from sklearn.model_selection import train_test_split
-# from torch.utils.data import Subset
-
+import functools
 
 def seed_randoms(seed=42):
     torch.manual_seed(seed)
@@ -22,7 +16,7 @@ def seed_randoms(seed=42):
     torch.backends.cudnn.benchmark = False
 
 
-class SentimentDataset(Dataset):
+class SentimentDataset(torch.utils.data.Dataset):
     def __init__(self, file_path, tokenizer, max_length=128):
         self.data = pd.read_csv(file_path, usecols=["Sentence", "Sentiment"])
         self.tokenizer = tokenizer
@@ -50,97 +44,139 @@ class SentimentDataset(Dataset):
         )
 
         return {
-            "input_ids": encoding["input_ids"].flatten(),
-            "attention_mask": encoding["attention_mask"].flatten(),
-            "label": torch.tensor(label, dtype=torch.long),
+            "input_ids": encoding["input_ids"].squeeze(0),
+            "attention_mask": encoding["attention_mask"].squeeze(0),
+            "label": torch.tensor(label, dtype=torch.float),
         }
 
 
-def train():
-    # logger.info("Training sentiment analysis model...")
-    tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased")
-    model = AutoModelForSequenceClassification.from_pretrained(
-        "distilbert-base-uncased"
+class SentimentRegressionModel(pl.LightningModule):
+    def __init__(self, model_name, learning_rate=5e-5, l2=0.0):
+        super().__init__()
+        self.save_hyperparameters()
+        self.tokenizer = AutoTokenizer.from_pretrained(model_name)
+        self.model = AutoModel.from_pretrained(model_name)
+        self.regression_head = nn.Linear(self.model.config.hidden_size, 1)  # Single output
+        self.criterion = nn.MSELoss()
+        self.learning_rate = learning_rate
+        self.l2 = l2
+
+    def forward(self, input_ids, attention_mask):
+        outputs = self.model(input_ids=input_ids, attention_mask=attention_mask)
+        pooled_output = outputs.last_hidden_state[:, 0, :]  # Use the [CLS] token
+        logits = self.regression_head(pooled_output)
+        return logits.squeeze(-1)
+
+    def training_step(self, batch, batch_idx):
+        input_ids = batch["input_ids"]
+        attention_mask = batch["attention_mask"]
+        labels = batch["label"]
+        logits = self(input_ids, attention_mask)
+        loss = self.criterion(logits, labels)
+        self.log("train_loss", loss)
+        return loss
+
+    def validation_step(self, batch, batch_idx):
+        input_ids = batch["input_ids"]
+        attention_mask = batch["attention_mask"]
+        labels = batch["label"]
+        logits = self(input_ids, attention_mask)
+        loss = self.criterion(logits, labels)
+        self.log("val_loss", loss, prog_bar=True)
+        return loss
+
+    def configure_optimizers(self):
+        optimizer = torch.optim.AdamW(
+            self.parameters(), lr=self.learning_rate, weight_decay=self.l2
+        )
+        return optimizer
+
+
+def objective(trial, train_dataset, val_dataset):
+    # Set random seed for reproducibility
+    seed_randoms()
+
+    # Define hyperparameter search space
+    model_name = "distilbert-base-uncased"
+
+    # Hyperparameters to tune
+    learning_rate = trial.suggest_float("learning_rate", 1e-7, 1e-3, log=True)
+    l2 = trial.suggest_float("l2", 1e-6, 1e-3, log = True)
+    batch_size = trial.suggest_categorical("batch_size", [32])
+
+
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+    val_loader = DataLoader(val_dataset, batch_size=batch_size)
+
+    # Initialize the model
+    model = SentimentRegressionModel(model_name, learning_rate=learning_rate, l2=l2)
+
+    # Trainer for Optuna
+    trainer = pl.Trainer(
+        max_epochs=3,
+        # accelerator="gpu" if torch.cuda.is_available() else "cpu",
+        # devices=1 if torch.cuda.is_available() else 0,
+        logger=False,
+        enable_checkpointing=False,
     )
-    model.classifier = nn.Linear(
-        model.config.hidden_size, 1
-    )  # Single output for regression
-    device = "cuda" if torch.cuda.is_available() else "cpu"
 
-    print(f"Model loaded on {device}.")
-    model.to(device)
-    # logger.info(f"Model loaded on {device}.")
+    # Train the model and return the validation loss
+    trainer.fit(model, train_loader, val_loader)
+    return trainer.callback_metrics["val_loss"].item()
 
-    # Load dataset
-    print("Loading dataset...")
-    dataset = SentimentDataset("data/raw/data.csv", tokenizer)
-    print(f"Dataset loaded with {len(dataset)} samples.")
 
-    # Split dataset into train, validation, and test sets
-    train_size = int(0.8 * len(dataset))
-    val_size = int(0.1 * len(dataset))
-    test_size = len(dataset) - train_size - val_size
+def main():
+    # Set up persistent storage for Optuna study
+    storage = RDBStorage("sqlite:///optuna_study.db")
+    study = optuna.create_study(storage=storage, study_name="models/sentiment_tuning", direction="minimize", load_if_exists=True)
 
-    train_dataset, val_dataset, test_dataset = torch.utils.data.random_split(
-        dataset, [train_size, val_size, test_size]
+    model_name = "distilbert-base-uncased"
+    dataset_path = "data/raw/data.csv"
+    
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    
+    dataset = SentimentDataset(dataset_path, tokenizer)
+    train_size = int(0.01 * len(dataset))
+    val_size = len(dataset) - train_size
+    train_dataset, val_dataset = random_split(dataset, [train_size, val_size])
+    
+    # Use functools.partial to pass arguments
+    partial_objective = functools.partial(objective, tokenizer=tokenizer, train_dataset=train_dataset, val_dataset=val_dataset)
+
+    # Run optimization
+    study.optimize(partial_objective, n_trials=1)  # Number of trials for tuning
+
+    print("Best trial:")
+    print(f"  Value: {study.best_trial.value}")
+    print(f"  Params: {study.best_trial.params}")
+
+    # Train the final model with the best hyperparameters
+    best_params = study.best_trial.params
+
+    # tokenizer = AutoTokenizer.from_pretrained(model_name)
+
+    # dataset = SentimentDataset(dataset_path, tokenizer)
+    # train_size = int(0.8 * len(dataset))
+    # val_size = len(dataset) - train_size
+    # train_dataset, val_dataset = random_split(dataset, [train_size, val_size])
+
+    train_loader = DataLoader(train_dataset, batch_size=int(best_params["batch_size"]), shuffle=True)
+    val_loader = DataLoader(val_dataset, batch_size=int(best_params["batch_size"]))
+
+    final_model = SentimentRegressionModel(
+        model_name, learning_rate=best_params["learning_rate"], l2=best_params["l2"]
     )
 
-    # Create dataloaders
-    train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
-    val_loader = DataLoader(val_dataset, batch_size=32, shuffle=False)
-    test_loader = DataLoader(test_dataset, batch_size=32, shuffle=False)
-    print("Dataloaders for train, validation, and test initialized.")
+    trainer = pl.Trainer(
+        max_epochs=5,  # Train longer for the final model
+        accelerator="gpu" if torch.cuda.is_available() else "cpu",
+        devices=1 if torch.cuda.is_available() else None,
+    )
 
-    # Training setup
-    criterion = nn.MSELoss()
-    optimizer = optim.Adam(model.parameters(), lr=5e-5)
-
-    # Training loop
-    for epoch in range(1):  # Example for 3 epochs
-        model.train()
-        running_loss = 0.0
-        for batch in tqdm(train_loader):
-            optimizer.zero_grad()
-            input_ids = batch["input_ids"].to(device)
-            attention_mask = batch["attention_mask"].to(device)
-            labels = batch["label"].to(device)
-
-            outputs = model(input_ids=input_ids, attention_mask=attention_mask)
-            logits = outputs.logits.squeeze(-1)  # Single output for regression
-            loss = criterion(logits, labels.float())
-
-            loss.backward()
-            optimizer.step()
-
-            running_loss += loss.item()
-
-        print(f"Epoch {epoch + 1}, Loss: {running_loss / len(train_loader)}")
-
-    print("Training complete.")
-
-    # Evaluation
-    model.eval()
-    mse_loss = 0.0
-    with torch.no_grad():
-        for batch in test_loader:
-            input_ids = batch["input_ids"].to(device)
-            attention_mask = batch["attention_mask"].to(device)
-            labels = batch["label"].to(device)
-
-            outputs = model(input_ids=input_ids, attention_mask=attention_mask)
-            logits = outputs.logits.squeeze(-1)
-            mse_loss += criterion(logits, labels.float()).item()
-
-    print(f"Test MSE Loss: {mse_loss / len(test_loader):.4f}")
-
-    all_labels, all_predictions = evaluate(model, test_loader, device)
-    visualize(all_labels, all_predictions)
-
-    # save model
-    model.save_pretrained("models/sentiment_model_finetuned")
+    trainer.fit(final_model, train_loader, val_loader)
+    final_model.model.save_pretrained("models/sentiment_model_finetuned")
+    final_model.tokenizer.save_pretrained("models/sentiment_model_finetuned")
 
 
 if __name__ == "__main__":
-    seed_randoms()
-    train()
-# 0.12612360943113549
+    main()
