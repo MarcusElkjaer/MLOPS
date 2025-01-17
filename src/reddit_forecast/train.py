@@ -8,13 +8,16 @@ from torch.utils.data import Dataset
 from tqdm import tqdm
 from reddit_forecast.visualize import visualize
 from evaluate import evaluate
+import hydra
+
 
 
 # from sklearn.model_selection import train_test_split
 # from torch.utils.data import Subset
 
-
-def seed_randoms(seed=42):
+@hydra.main(version_base=None, config_path="../../configs", config_name="config.yaml")
+def seed_randoms(cfg):
+    seed = cfg.train.seed
     torch.manual_seed(seed)
     torch.cuda.manual_seed(seed)
     torch.cuda.manual_seed_all(seed)
@@ -23,7 +26,8 @@ def seed_randoms(seed=42):
 
 
 class SentimentDataset(Dataset):
-    def __init__(self, file_path, tokenizer, max_length=128):
+    def __init__(self, file_path, tokenizer, cfg):
+        max_length=cfg.train.max_length
         self.data = pd.read_csv(file_path, usecols=["Sentence", "Sentiment"])
         self.tokenizer = tokenizer
         self.max_length = max_length
@@ -55,8 +59,8 @@ class SentimentDataset(Dataset):
             "label": torch.tensor(label, dtype=torch.long),
         }
 
-
-def train():
+@hydra.main(version_base=None, config_path="../../configs", config_name="config.yaml")
+def train(cfg):
     # logger.info("Training sentiment analysis model...")
     tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased")
     model = AutoModelForSequenceClassification.from_pretrained(
@@ -73,12 +77,12 @@ def train():
 
     # Load dataset
     print("Loading dataset...")
-    dataset = SentimentDataset("data/raw/data.csv", tokenizer)
+    dataset = SentimentDataset("data/raw/data.csv", tokenizer, cfg)
     print(f"Dataset loaded with {len(dataset)} samples.")
 
     # Split dataset into train, validation, and test sets
-    train_size = int(0.8 * len(dataset))
-    val_size = int(0.1 * len(dataset))
+    train_size = int(cfg.train.train_split * len(dataset))
+    val_size = int(cfg.train.val_split * len(dataset))
     test_size = len(dataset) - train_size - val_size
 
     train_dataset, val_dataset, test_dataset = torch.utils.data.random_split(
@@ -86,17 +90,17 @@ def train():
     )
 
     # Create dataloaders
-    train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
-    val_loader = DataLoader(val_dataset, batch_size=32, shuffle=False)
-    test_loader = DataLoader(test_dataset, batch_size=32, shuffle=False)
+    train_loader = DataLoader(train_dataset, batch_size=cfg.train.batch_size, shuffle=True)
+    val_loader = DataLoader(val_dataset, batch_size=cfg.train.batch_size, shuffle=False)
+    test_loader = DataLoader(test_dataset, batch_size=cfg.train.batch_size, shuffle=False)
     print("Dataloaders for train, validation, and test initialized.")
 
     # Training setup
     criterion = nn.MSELoss()
-    optimizer = optim.Adam(model.parameters(), lr=5e-5)
+    optimizer = optim.Adam(model.parameters(), lr=cfg.train.lr)
 
     # Training loop
-    for epoch in range(1):  # Example for 3 epochs
+    for epoch in range(cfg.train.epoch):  # Example for 3 epochs
         model.train()
         running_loss = 0.0
         for batch in tqdm(train_loader):

@@ -1,0 +1,12 @@
+
+model:
+  batch_size: 32
+
+train:
+    seed: 42
+    max_length: 128
+    train_split: 0.8
+    val_split: 0.1
+    batch_size: 32
+    lr: 5e-5
+    epoch: 1
