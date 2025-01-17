@@ -108,7 +108,13 @@ if __name__ == "__main__":
     import os
     import zipfile
     import subprocess
+    from pathlib import Path
+    from google.cloud import storage
 
+    # Run DVC pull
+    print("Running DVC pull to fetch data...")
+    subprocess.run(["dvc", "pull"], check=True)
+    print("DVC pull completed.")
     dataset = "justinmiller/reddit-pennystock-data"
     raw_data_path: str = Path("data/raw")
     processed_path: str = Path("data/processed")
