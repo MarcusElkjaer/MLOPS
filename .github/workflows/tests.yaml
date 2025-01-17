@@ -13,7 +13,6 @@ jobs:
         operating-system: ["ubuntu-latest", "windows-latest", "macos-latest"]
         python-version: ["3.11"]
 
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -37,6 +36,13 @@ jobs:
       - name: Run linting
         run: |
           ruff check src tests --fix
+
+      - name: Set environment variables
+        uses: actions/github-script@v6
+        with:
+          script: |
+            process.env.REDDIT_CLIENT_ID = '${{ secrets.REDDIT_CLIENT_ID }}';
+            process.env.REDDIT_CLIENT_SECRET = '${{ secrets.REDDIT_CLIENT_SECRET }}';
 
       # MacOS-specific memory optimization
       - name: Optimize memory for macOS
