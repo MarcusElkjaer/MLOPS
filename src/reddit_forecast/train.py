@@ -10,6 +10,12 @@ from tqdm import tqdm
 # from sklearn.model_selection import train_test_split
 # from torch.utils.data import Subset
 
+def seed_randoms(seed=42):
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
 
 class SentimentDataset(Dataset):
     def __init__(self, file_path, tokenizer, max_length=128):
@@ -75,9 +81,9 @@ def train():
     )
 
     # Create dataloaders
-    train_loader = DataLoader(train_dataset, batch_size=16, shuffle=True)
-    val_loader = DataLoader(val_dataset, batch_size=16, shuffle=False)
-    test_loader = DataLoader(test_dataset, batch_size=16, shuffle=False)
+    train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
+    val_loader = DataLoader(val_dataset, batch_size=32, shuffle=False)
+    test_loader = DataLoader(test_dataset, batch_size=32, shuffle=False)
     print("Dataloaders for train, validation, and test initialized.")
 
     # Training setup
@@ -126,4 +132,6 @@ def train():
 
 
 if __name__ == "__main__":
+    seed_randoms()
     train()
+#0.12612360943113549
