@@ -6,7 +6,7 @@ loguru==0.7.3
 matplotlib==3.8.2
 numpy==1.26.4
 pandas==2.2.3
-pydantic==2.0.1
+pydantic==2.10.5
 pydantic-core>=2.0.2  # Allow pip to select a compatible version
 pytest==6.2.4
 safetensors==0.5.2
@@ -23,3 +23,6 @@ coverage==7.6.10
 ruff
 pre-commit
 tabulate
+fastapi
+uvicorn
+python-dotenv
