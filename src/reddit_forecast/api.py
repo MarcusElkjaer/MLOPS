@@ -95,7 +95,7 @@ def read_root():
 
 @app.get("/analyze_sentiment")
 def analyze_sentiment(text: str):
-    return analyze_sentiment_batch([text])
+    return analyze_sentiment_batch([text])[0]
 
 @app.get("/get_last_month_posts")
 def get_last_month_posts_endpoint(search_term: str, subreddit: str = "wallstreetbets"):
