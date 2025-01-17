@@ -6,9 +6,13 @@ import torch.optim as optim
 import pandas as pd
 from torch.utils.data import Dataset
 from tqdm import tqdm
+from reddit_forecast.visualize import visualize
+from evaluate import evaluate
+
 
 # from sklearn.model_selection import train_test_split
 # from torch.utils.data import Subset
+
 
 def seed_randoms(seed=42):
     torch.manual_seed(seed)
@@ -16,6 +20,7 @@ def seed_randoms(seed=42):
     torch.cuda.manual_seed_all(seed)
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
+
 
 class SentimentDataset(Dataset):
     def __init__(self, file_path, tokenizer, max_length=128):
@@ -91,7 +96,7 @@ def train():
     optimizer = optim.Adam(model.parameters(), lr=5e-5)
 
     # Training loop
-    for epoch in range(3):  # Example for 3 epochs
+    for epoch in range(1):  # Example for 3 epochs
         model.train()
         running_loss = 0.0
         for batch in tqdm(train_loader):
@@ -127,6 +132,10 @@ def train():
             mse_loss += criterion(logits, labels.float()).item()
 
     print(f"Test MSE Loss: {mse_loss / len(test_loader):.4f}")
+
+    all_labels, all_predictions = evaluate(model, test_loader, device)
+    visualize(all_labels, all_predictions)
+
     # save model
     model.save_pretrained("models/sentiment_model_finetuned")
 
@@ -134,4 +143,4 @@ def train():
 if __name__ == "__main__":
     seed_randoms()
     train()
-#0.12612360943113549
+# 0.12612360943113549

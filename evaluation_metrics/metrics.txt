@@ -1,0 +1,2 @@
+Mean Squared Error: 0.1001
+R-squared: 0.5359
