@@ -23,6 +23,13 @@ outs:
       remote_storage:
         etag: 08d9808febc9fc8a031001
         version_id: '1737110753362009'
+  - relpath: raw/hello.txt
+    md5: d41d8cd98f00b204e9800998ecf8427e
+    size: 0
+    cloud:
+      remote_storage:
+        etag: 089fabbfaae1fc8a031001
+        version_id: '1737117060289951'
   - relpath: raw/reddit-pennystock-data.zip
     md5: 2ecc32f084de3aee78010d0f938fd78c
     size: 171370866
