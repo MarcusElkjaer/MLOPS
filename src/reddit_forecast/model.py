@@ -29,7 +29,7 @@ def analyze_sentiment_batch(texts: list[str]) -> list[Tuple[Optional[str], Optio
         results = [(None, None)] * len(texts)
     return results
 
-@hydra.main(config_name="config")
+@hydra.main(config_path="../../configs", config_name="config.yaml")
 def apply_sentiment_analysis(input_path: str, output_path: str, cfg) -> None:
     """Apply sentiment analysis to preprocessed data."""
     df = pd.read_csv(input_path)

@@ -1,0 +1,16 @@
+model:
+  batch_size: 32
+train:
+  seed: 42
+  max_length: 128
+  train_split: 0.01
+  batch_size: 32
+  lr: 5.0e-05
+  l2: 0.0
+  lr_min: 1.0e-07
+  lr_max: 0.001
+  l2_min: 1.0e-06
+  l2_max: 0.001
+  optuna_epoch: 3
+  final_epoch: 5
+  n_trials: 1
