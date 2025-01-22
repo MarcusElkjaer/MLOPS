@@ -72,7 +72,7 @@ def test_apply_sentiment_analysis():
     ):
         from reddit_forecast.model import run_sentiment_analysis
 
-        run_sentiment_analysis(input_path, output_path)
+        run_sentiment_analysis(input_path, output_path, batch_size=2)
 
         result_df = pd.read_csv(output_path)
         assert "sentiment" in result_df.columns
