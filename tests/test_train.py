@@ -18,10 +18,6 @@ def mock_tokenizer():
     return tokenizer
 
 
-
-
-
-
 def test_sentiment_dataset(mock_tokenizer):
     mock_cfg = MagicMock()
     mock_cfg.train.max_length = 128

@@ -8,6 +8,10 @@ from dotenv import load_dotenv
 import os
 from collections import defaultdict
 
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+from fastapi.requests import Request
+
 # Load environment variables from .env file
 load_dotenv()
 app = FastAPI()
@@ -85,9 +89,9 @@ def calculate_average_sentiment(posts):
     average_sentiment_per_day.sort(key=lambda x: x['date'])
     return average_sentiment_per_day
 
-@app.get("/")
-def read_root():
-    return HTTPStatus.OK
+# @app.get("/")
+# def read_root():
+#     return HTTPStatus.OK
 
 @app.get("/analyze_sentiment")
 def analyze_sentiment(text: str):
@@ -105,3 +109,13 @@ def get_average_sentiment_endpoint(search_term: str, subreddit: str = "wallstree
     posts_with_sentiment = analyze_posts_sentiment(posts)
     average_sentiment = calculate_average_sentiment(posts_with_sentiment)
     return average_sentiment
+
+
+#code to server the react app in frontend/dist/index.html
+app.mount("/", StaticFiles(directory="frontend/dist", html=True), name="static")
+templates = Jinja2Templates(directory="frontend/dist")
+@app.get("/", include_in_schema=False)
+def read_root(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
+
+# run with: uvicorn reddit_forecast.api:app --reload --port 8000
