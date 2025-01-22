@@ -9,6 +9,7 @@ import pandas as pd
 import functools
 import hydra
 import os
+from hydra.utils import to_absolute_path
 
 
 def seed_randoms(cfg):
@@ -53,7 +54,6 @@ class SentimentDataset(torch.utils.data.Dataset):
             "attention_mask": encoding["attention_mask"].squeeze(0),
             "label": torch.tensor(label, dtype=torch.float),
         }
-
 
 
 class SentimentRegressionModel(pl.LightningModule):
@@ -146,7 +146,7 @@ def main(cfg):
     )
 
     model_name = "distilbert-base-uncased"
-    dataset_path = cfg.train.data_path
+    dataset_path = to_absolute_path(cfg.train.data_path)
     tokenizer = AutoTokenizer.from_pretrained(model_name)
 
     dataset = SentimentDataset(dataset_path, tokenizer, cfg)
