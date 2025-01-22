@@ -32,10 +32,9 @@ def analyze_sentiment_batch(
     return results
 
 
-# In reddit_forecast/model.py
-
-
-def run_sentiment_analysis(input_path: str, output_path: str, batch_size: int) -> None:
+@hydra.main(config_path="../../configs", config_name="config.yaml")
+def apply_sentiment_analysis(input_path: str, output_path: str, cfg) -> None:
+    """Apply sentiment analysis to preprocessed data."""
     df = pd.read_csv(input_path)
 
     # Drop rows with missing or invalid text
@@ -43,22 +42,18 @@ def run_sentiment_analysis(input_path: str, output_path: str, batch_size: int) -
     df = df[df["text"].apply(lambda x: isinstance(x, str) and len(x.strip()) > 0)]
 
     # Process in batches
+    batch_size = cfg.model.batch_size
     sentiments = []
     for i in range(0, len(df), batch_size):
         batch_texts = df["text"].iloc[i : i + batch_size].tolist()
         sentiments.extend(analyze_sentiment_batch(batch_texts))
 
-    # Add sentiment and sentiment score columns
+    # Add sentiment and sentiment score
     df[["sentiment", "sentiment_score"]] = pd.DataFrame(sentiments)
 
-    # Save the processed data
+    # Save cleaned and processed data
     df.to_csv(output_path, index=False)
     logger.info(f"Processed data saved to: {output_path}")
-
-
-@hydra.main(config_path="../../configs", config_name="config.yaml")
-def apply_sentiment_analysis(input_path: str, output_path: str, cfg) -> None:
-    run_sentiment_analysis(input_path, output_path, cfg.model.batch_size)
 
 
 if __name__ == "__main__":

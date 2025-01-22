@@ -70,9 +70,9 @@ def test_apply_sentiment_analysis():
     with patch(
         "reddit_forecast.model.analyze_sentiment_batch", mock_analyze_sentiment_batch
     ):
-        from reddit_forecast.model import run_sentiment_analysis
+        from reddit_forecast.model import apply_sentiment_analysis
 
-        run_sentiment_analysis(input_path, output_path, batch_size=2)
+        apply_sentiment_analysis(input_path, output_path)
 
         result_df = pd.read_csv(output_path)
         assert "sentiment" in result_df.columns
