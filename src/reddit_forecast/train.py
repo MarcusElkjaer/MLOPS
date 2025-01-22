@@ -55,13 +55,16 @@ class SentimentDataset(torch.utils.data.Dataset):
         }
 
 
+
 class SentimentRegressionModel(pl.LightningModule):
     def __init__(self, model_name, learning_rate, l2):
         super().__init__()
         self.save_hyperparameters()
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
         self.model = AutoModel.from_pretrained(model_name)
-        self.regression_head = nn.Linear(self.model.config.hidden_size, 1)  # Single output
+        self.regression_head = nn.Linear(
+            self.model.config.hidden_size, 1
+        )  # Single output
         self.criterion = nn.MSELoss()
         self.learning_rate = learning_rate
         self.l2 = l2
@@ -105,10 +108,11 @@ def objective(trial, train_dataset, val_dataset, cfg):
     model_name = "distilbert-base-uncased"
 
     # Hyperparameters to tune
-    learning_rate = trial.suggest_float("learning_rate", cfg.train.lr_min, cfg.train.lr_max, log=True)
-    l2 = trial.suggest_float("l2", cfg.train.l2_min, cfg.train.l2_max, log = True)
+    learning_rate = trial.suggest_float(
+        "learning_rate", cfg.train.lr_min, cfg.train.lr_max, log=True
+    )
+    l2 = trial.suggest_float("l2", cfg.train.l2_min, cfg.train.l2_max, log=True)
     batch_size = trial.suggest_categorical("batch_size", [cfg.train.batch_size])
-
 
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
     val_loader = DataLoader(val_dataset, batch_size=batch_size)
@@ -118,7 +122,7 @@ def objective(trial, train_dataset, val_dataset, cfg):
 
     # Trainer for Optuna
     trainer = pl.Trainer(
-        max_epochs = cfg.train.optuna_epoch,
+        max_epochs=cfg.train.optuna_epoch,
         # accelerator="gpu" if torch.cuda.is_available() else "cpu",
         # devices=1 if torch.cuda.is_available() else 0,
         logger=False,
@@ -129,27 +133,36 @@ def objective(trial, train_dataset, val_dataset, cfg):
     trainer.fit(model, train_loader, val_loader)
     return trainer.callback_metrics["val_loss"].item()
 
+
 @hydra.main(config_path="../../configs", config_name="config.yaml")
 def main(cfg):
     # Set up persistent storage for Optuna study
     storage = RDBStorage("sqlite:///optuna_study.db")
-    study = optuna.create_study(storage=storage, study_name="models/sentiment_tuning", direction="minimize", load_if_exists=True)
+    study = optuna.create_study(
+        storage=storage,
+        study_name="models/sentiment_tuning",
+        direction="minimize",
+        load_if_exists=True,
+    )
 
     model_name = "distilbert-base-uncased"
-    dataset_path = os.path.join(hydra.utils.get_original_cwd(), "data/raw/data.csv")
-    
+    dataset_path = cfg.train.data_path
     tokenizer = AutoTokenizer.from_pretrained(model_name)
-    
+
     dataset = SentimentDataset(dataset_path, tokenizer, cfg)
     train_size = int(cfg.train.train_split * len(dataset))
     val_size = len(dataset) - train_size
     train_dataset, val_dataset = random_split(dataset, [train_size, val_size])
-    
+
     # Use functools.partial to pass arguments
-    partial_objective = functools.partial(objective, train_dataset=train_dataset, val_dataset=val_dataset, cfg=cfg)
+    partial_objective = functools.partial(
+        objective, train_dataset=train_dataset, val_dataset=val_dataset, cfg=cfg
+    )
 
     # Run optimization
-    study.optimize(partial_objective, n_trials = cfg.train.n_trials)  # Number of trials for tuning
+    study.optimize(
+        partial_objective, n_trials=cfg.train.n_trials
+    )  # Number of trials for tuning
 
     print("Best trial:")
     print(f"  Value: {study.best_trial.value}")
@@ -165,7 +178,9 @@ def main(cfg):
     # val_size = len(dataset) - train_size
     # train_dataset, val_dataset = random_split(dataset, [train_size, val_size])
 
-    train_loader = DataLoader(train_dataset, batch_size=int(best_params["batch_size"]), shuffle=True)
+    train_loader = DataLoader(
+        train_dataset, batch_size=int(best_params["batch_size"]), shuffle=True
+    )
     val_loader = DataLoader(val_dataset, batch_size=int(best_params["batch_size"]))
 
     final_model = SentimentRegressionModel(
