@@ -20,7 +20,7 @@ app = FastAPI()
 
 # You can add additional URLs to this list, for example, the frontend's production domain, or other frontends.
 allowed_origins = [
-    "http://localhost:5173"
+    "*"
 ]
 
 app.add_middleware(

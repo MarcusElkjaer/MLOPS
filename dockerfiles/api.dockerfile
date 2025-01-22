@@ -25,9 +25,9 @@ RUN npm install
 
 # Run the frontend and backend servers
 WORKDIR /
-EXPOSE 5173 8000
+EXPOSE 5173 8080
 
 # Start both the backend and frontend
-CMD ["sh", "-c", "uvicorn reddit_forecast.api:app --host 0.0.0.0 --port 8000:8080 & npm run --prefix frontend dev -- --host"]
+CMD ["sh", "-c", "uvicorn reddit_forecast.api:app --host 0.0.0.0 --port 8080 & npm run --prefix frontend dev -- --host"]
 
 
