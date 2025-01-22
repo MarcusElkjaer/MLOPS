@@ -1,4 +1,4 @@
-name: Build Docker Images
+name: Build and Push Docker Image for model.py
 
 on:
   push:
@@ -22,21 +22,19 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      # Log in to Docker Hub using secrets
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v2
+      # Authenticate with Google Cloud
+      - name: Authenticate with Google Cloud
+        uses: google-github-actions/auth@v1
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
 
-      # Build and push API image
-      - name: Build and Push API Image
+      # Configure Docker to use Google Artifact Registry
+      - name: Configure Docker for Artifact Registry
         run: |
-          docker build -f dockerfiles/api.dockerfile -t ${{ secrets.DOCKER_USERNAME }}/reddit_forecast_api:latest .
-          docker push ${{ secrets.DOCKER_USERNAME }}/reddit_forecast_api:latest
+          gcloud auth configure-docker REGION-docker.pkg.dev
 
-      # Build and push training image
-      - name: Build and Push Training Image
+      # Build and push the model image
+      - name: Build and Push Model Image
         run: |
-          docker build -f dockerfiles/train.dockerfile -t ${{ secrets.DOCKER_USERNAME }}/reddit_forecast_train:latest .
-          docker push ${{ secrets.DOCKER_USERNAME }}/reddit_forecast_train:latest
+          docker build -f dockerfiles/api.dockerfile -t REGION-docker.pkg.dev/mlops-448109/mlops-artifact-registry/reddit_forecast_model:latest .
+          docker push REGION-docker.pkg.dev/mlops-448109/mlops-artifact-registry/reddit_forecast_model:latest
