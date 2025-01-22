@@ -63,7 +63,8 @@ jobs:
               # Delete the untagged image without affecting other tags
               gcloud artifacts docker images delete "$CLEANED_IMAGE" --quiet
           done
-# Step 6: Deploy to Cloud Run with 4GB memory allocation
+
+      # Step 5: Deploy to Cloud Run with 4GB memory allocation
       - name: Deploy to Cloud Run
         run: |
           # Grant public access to the service (unauthenticated access)
@@ -80,4 +81,30 @@ jobs:
             --port 8000 \
             --memory 4Gi \
             --allow-unauthenticated
+
+      # Step 6: Wait for the service to respond
+      - name: Wait for Service to Start
+        run: |
+          echo "Waiting for the service to respond..."
+          SERVICE_URL=$(gcloud run services describe reddit-forecast-model --region europe-west4 --format 'value(status.url)')
+          echo "Service URL: $SERVICE_URL"
+
+          MAX_RETRIES=30
+          RETRY_COUNT=0
+          while [[ $RETRY_COUNT -lt $MAX_RETRIES ]]; do
+            # Check if the service responds with HTTP 200
+            if curl --silent --fail "$SERVICE_URL" > /dev/null; then
+              echo "Service is up and running at $SERVICE_URL"
+              break
+            fi
+            RETRY_COUNT=$((RETRY_COUNT + 1))
+            echo "Waiting for the application to respond... (retry $RETRY_COUNT/$MAX_RETRIES)"
+            sleep 2
+          done
+
+          # Exit with an error if the service did not respond
+          if [[ $RETRY_COUNT -eq $MAX_RETRIES ]]; then
+            echo "Application did not start within the expected time. Please check the Cloud Run logs for issues."
+            exit 1
+          fi
 
