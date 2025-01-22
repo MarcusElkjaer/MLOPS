@@ -99,23 +99,23 @@ def test_preprocess_file_not_found():
             preprocess(raw_data_path, output_folder)
 
 
-# def test_my_dataset_getitem_out_of_bounds():
-#     """Test __getitem__ with an out-of-bounds index."""
-#     mock_data = pd.DataFrame(
-#         {
-#             "ticker": ["AAPL"],
-#             "text": ["Sample text"],
-#             "flair": ["bullish"],
-#             "timestamp": ["2022-01-01"],
-#         }
-#     )
+def test_my_dataset_getitem_out_of_bounds():
+    """Test __getitem__ with an out-of-bounds index."""
+    mock_data = pd.DataFrame(
+        {
+            "ticker": ["AAPL"],
+            "text": ["Sample text"],
+            "flair": ["bullish"],
+            "timestamp": ["2022-01-01"],
+        }
+    )
 
-#     mock_path = Path("data/processed")
-#     with patch("pandas.read_csv", return_value=mock_data):
-#         dataset = MyDataset(mock_path)
+    mock_path = Path("data/processed/preprocessed_data.csv")
+    with patch("pandas.read_csv", return_value=mock_data):
+        dataset = MyDataset(mock_path)
 
-#     with pytest.raises(IndexError):
-#         _ = dataset[10]
+    with pytest.raises(IndexError):
+        _ = dataset[10]
 
 
 if __name__ == "__main__":
