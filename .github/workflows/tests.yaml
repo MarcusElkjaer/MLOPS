@@ -44,6 +44,12 @@ jobs:
       - name: Get data
         run: |
           dvc pull --no-run-cache --force --verbose
+      - name: build frontend
+        run: |
+          apt-get install npm
+          cd frontend
+          npm install
+          npm run build
 
       # MacOS-specific memory optimization
       - name: Optimize memory for macOS
