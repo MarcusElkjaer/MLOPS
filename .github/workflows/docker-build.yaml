@@ -31,10 +31,10 @@ jobs:
       # Configure Docker to use Google Artifact Registry
       - name: Configure Docker for Artifact Registry
         run: |
-          gcloud auth configure-docker REGION-docker.pkg.dev
+          gcloud auth configure-docker europe-west4-docker.pkg.dev
 
       # Build and push the model image
       - name: Build and Push Model Image
         run: |
-          docker build -f dockerfiles/api.dockerfile -t REGION-docker.pkg.dev/mlops-448109/mlops-artifact-registry/reddit_forecast_model:latest .
-          docker push REGION-docker.pkg.dev/mlops-448109/mlops-artifact-registry/reddit_forecast_model:latest
+          docker build -f dockerfiles/api.dockerfile -t europe-west4-docker.pkg.dev/mlops-448109/mlops-artifact-registry/reddit_forecast_model:latest .
+          docker push europe-west4-docker.pkg.dev/mlops-448109/mlops-artifact-registry/reddit_forecast_model:latest
