@@ -25,6 +25,7 @@ RUN npm install
 
 # Run the frontend and backend servers
 WORKDIR /
+#5173
 EXPOSE 5173 8080
 
 # Start both the backend and frontend
