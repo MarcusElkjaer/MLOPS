@@ -23,10 +23,10 @@ RUN pip install . --no-deps --no-cache-dir --verbose
 COPY frontend frontend/
 WORKDIR /frontend
 RUN npm install
+RUN npm run build
 
 # Run the frontend and backend servers
 WORKDIR /
-#5173
 EXPOSE 8000
 
 # Start both the backend and frontend
