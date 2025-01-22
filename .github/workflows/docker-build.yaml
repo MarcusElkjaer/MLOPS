@@ -29,7 +29,7 @@ jobs:
       - name: Get data
         run: |
           pip install dvc
-          pip install dvc-gc
+          pip install dvc-gs
           dvc pull --no-run-cache --force --verbose
 
       # Step 2: Authenticate with Google Cloud
