@@ -7,8 +7,6 @@ train:
     max_length: 128
     train_split: 0.01
     batch_size: 32
-    lr: 5e-5
-    l2: 0.0
     lr_min: 1e-7            # Minimum learning rate for tuning
     lr_max: 1e-3            # Maximum learning rate for tuning
     l2_min: 1e-6            # Minimum L2 regularization for tuning
