@@ -44,6 +44,16 @@ jobs:
       - name: Get data
         run: |
           dvc pull --no-run-cache --force --verbose
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16' # Specify your desired Node.js version
+
+      - name: build frontend
+        run: |
+          cd frontend
+          npm install
+          npm run build
 
       # MacOS-specific memory optimization
       - name: Optimize memory for macOS

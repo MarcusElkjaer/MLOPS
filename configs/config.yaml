@@ -16,3 +16,4 @@ train:
     optuna_epoch: 5
     final_epoch: 5
     n_trials: 20
+    data_path: data/raw/data.csv

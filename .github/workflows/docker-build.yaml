@@ -21,6 +21,16 @@ jobs:
       # Step 1: Checkout code from the repository
       - name: Checkout Code
         uses: actions/checkout@v3
+      #get github secrets and put in .env file
+      - name: Set up Environment Variables
+        run: |
+          echo "REDDIT_CLIENT_ID=${{ secrets.REDDIT_CLIENT_ID }}" >> .env
+          echo "REDDIT_CLIENT_SECRET=${{ secrets.REDDIT_CLIENT_SECRET }}" >> .env
+      - name: Get data
+        run: |
+          pip install dvc
+          pip install dvc-gs
+          dvc pull --no-run-cache --force --verbose
 
       # Step 2: Authenticate with Google Cloud
       - name: Authenticate with Google Cloud
