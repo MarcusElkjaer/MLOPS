@@ -26,6 +26,11 @@ jobs:
         run: |
           echo "REDDIT_CLIENT_ID=${{ secrets.REDDIT_CLIENT_ID }}" >> .env
           echo "REDDIT_CLIENT_SECRET=${{ secrets.REDDIT_CLIENT_SECRET }}" >> .env
+      - name: Get data
+        run: |
+          pip install dvc
+          pip install dvc-gc
+          dvc pull --no-run-cache --force --verbose
 
       # Step 2: Authenticate with Google Cloud
       - name: Authenticate with Google Cloud
