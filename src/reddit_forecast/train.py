@@ -56,10 +56,8 @@ class SentimentDataset(torch.utils.data.Dataset):
 
 
 class SentimentRegressionModel(pl.LightningModule):
-    def __init__(self, model_name, cfg):
+    def __init__(self, model_name, learning_rate, l2):
         super().__init__()
-        l2 = cfg.train.l2
-        learning_rate  = cfg.train.lr
         self.save_hyperparameters()
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
         self.model = AutoModel.from_pretrained(model_name)
@@ -116,7 +114,7 @@ def objective(trial, train_dataset, val_dataset, cfg):
     val_loader = DataLoader(val_dataset, batch_size=batch_size)
 
     # Initialize the model
-    model = SentimentRegressionModel(model_name, cfg)
+    model = SentimentRegressionModel(model_name, learning_rate, l2)
 
     # Trainer for Optuna
     trainer = pl.Trainer(
