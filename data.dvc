@@ -7,33 +7,33 @@ outs:
     size: 1033838
     cloud:
       remote_storage:
-        etag: 08feaef39da8898b031001
-        version_id: '1737548409657214'
+        etag: 08a2e59efbae898b031001
+        version_id: '1737550216016546'
   - relpath: raw/data.csv
     md5: dcd72bae7e4f725c0281e66379f73e83
     size: 745117
     cloud:
       remote_storage:
-        etag: 08d8ddd89ca8898b031001
-        version_id: '1737548407123672'
+        etag: 08e3ea80fbae898b031001
+        version_id: '1737550215525731'
   - relpath: raw/financial-sentiment-analysis.zip
     md5: c58a761603230832aa1f1aba825bbd24
     size: 282375
     cloud:
       remote_storage:
-        etag: 08ded98a9da8898b031001
-        version_id: '1737548407942366'
+        etag: 08e8d891fbae898b031001
+        version_id: '1737550215801960'
   - relpath: raw/reddit-pennystock-data.zip
     md5: 2ecc32f084de3aee78010d0f938fd78c
     size: 171370866
     cloud:
       remote_storage:
-        etag: 08c3bdf2aca8898b031001
-        version_id: '1737548441099971'
+        etag: 0888efb294af898b031001
+        version_id: '1737550268774280'
   - relpath: raw/saps.json
     md5: c27cbb9c079f9baaafd5c32c2437796d
     size: 1002289832
     cloud:
       remote_storage:
-        etag: 08cf8ff7f8a8898b031001
-        version_id: '1737548600559567'
+        etag: 08d090e2faae898b031001
+        version_id: '1737550215022672'
