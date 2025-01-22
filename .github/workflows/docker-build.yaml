@@ -53,14 +53,21 @@ jobs:
         run: |
           docker build -f dockerfiles/api.dockerfile -t europe-west4-docker.pkg.dev/mlops-448109/mlops-artifact-registry/reddit_forecast_model:latest .
           docker push europe-west4-docker.pkg.dev/mlops-448109/mlops-artifact-registry/reddit_forecast_model:latest
-
-      # Step 6: Deploy to Cloud Run with 4GB memory allocation
+# Step 6: Deploy to Cloud Run with 4GB memory allocation
       - name: Deploy to Cloud Run
         run: |
-          gcloud run deploy reddit-forecast-model-1 \
+          # Grant public access to the service (unauthenticated access)
+          gcloud beta run services add-iam-policy-binding reddit-forecast-model \
+            --region=europe-west4 \
+            --member=allUsers \
+            --role=roles/run.invoker
+
+          # Deploy the service to Cloud Run
+          gcloud run deploy reddit-forecast-model \
             --image europe-west4-docker.pkg.dev/mlops-448109/mlops-artifact-registry/reddit_forecast_model:latest \
             --platform managed \
             --region europe-west4 \
             --port 8080 \
             --memory 4Gi \
             --allow-unauthenticated
+
