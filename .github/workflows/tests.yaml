@@ -41,7 +41,9 @@ jobs:
         run: |
           echo "REDDIT_CLIENT_ID=${{ secrets.REDDIT_CLIENT_ID }}" >> $GITHUB_ENV
           echo "REDDIT_CLIENT_SECRET=${{ secrets.REDDIT_CLIENT_SECRET }}" >> $GITHUB_ENV
-
+      - name: Get data
+        run: |
+          PYTHONPATH=src python data.py
 
       # MacOS-specific memory optimization
       - name: Optimize memory for macOS
