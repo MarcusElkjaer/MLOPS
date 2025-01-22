@@ -8,13 +8,14 @@ RUN apt update && \
 
 # Copy backend files
 COPY src src/
+COPY .env .env
 COPY requirements.txt requirements.txt
 COPY requirements_dev.txt requirements_dev.txt
 COPY README.md README.md
 COPY pyproject.toml pyproject.toml
 
 # Install Python dependencies
-RUN --mount=type=cache,target=~/pip/.cache pip install -r requirements.txt --no-cache-dir
+RUN --mount=type=cache,target=~/pip/.cache pip install -r requirements.txt
 #RUN pip install -r requirements.txt --no-cache-dir --verbose
 RUN pip install . --no-deps --no-cache-dir --verbose
 
@@ -26,9 +27,9 @@ RUN npm install
 # Run the frontend and backend servers
 WORKDIR /
 #5173
-EXPOSE 5173 8080
+EXPOSE 8000
 
 # Start both the backend and frontend
-CMD ["sh", "-c", "uvicorn reddit_forecast.api:app --host 0.0.0.0 --port 8080 & npm run --prefix frontend dev -- --host"]
+CMD ["sh", "-c", "uvicorn reddit_forecast.api:app --host 0.0.0.0 --port 8000"]
 
 

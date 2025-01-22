@@ -21,6 +21,11 @@ jobs:
       # Step 1: Checkout code from the repository
       - name: Checkout Code
         uses: actions/checkout@v3
+      #get github secrets and put in .env file
+      - name: Set up Environment Variables
+        run: |
+          echo "REDDIT_CLIENT_ID=${{ secrets.REDDIT_CLIENT_ID }}" >> .env
+          echo "REDDIT_CLIENT_SECRET=${{ secrets.REDDIT_CLIENT_SECRET }}" >> .env
 
       # Step 2: Authenticate with Google Cloud
       - name: Authenticate with Google Cloud
@@ -69,7 +74,7 @@ jobs:
             --image europe-west4-docker.pkg.dev/mlops-448109/mlops-artifact-registry/reddit_forecast_model:latest \
             --platform managed \
             --region europe-west4 \
-            --port 8080 \
+            --port 8000 \
             --memory 4Gi \
             --allow-unauthenticated
 
