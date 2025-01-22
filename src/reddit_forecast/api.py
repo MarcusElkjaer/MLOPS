@@ -35,8 +35,6 @@ test_client = TestClient(app)
 
 
 
-
-
 # Initialize the Reddit client
 reddit = praw.Reddit(
     client_id=os.getenv('REDDIT_CLIENT_ID'),
