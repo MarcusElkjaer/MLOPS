@@ -1,4 +1,4 @@
-name: Build and Push Docker Image for model.py
+name: Build, Push, and Cleanup Docker Image for model.py
 
 on:
   push:
@@ -32,6 +32,25 @@ jobs:
       - name: Configure Docker for Artifact Registry
         run: |
           gcloud auth configure-docker europe-west4-docker.pkg.dev
+
+      # Cleanup old untagged images from Artifact Registry
+      - name: Cleanup Old Images
+        run: |
+          echo "Fetching old untagged images..."
+          gcloud artifacts docker images list europe-west4-docker.pkg.dev/mlops-448109/mlops-artifact-registry --format="value(digest, updateTime)" | while read -r line; do
+            DIGEST=$(echo $line | awk '{print $1}')
+            TIMESTAMP=$(echo $line | awk '{print $2}')
+            
+            # Define retention period in days
+            RETENTION_DAYS=7
+            CUTOFF_DATE=$(date -d "-${RETENTION_DAYS} days" +%Y-%m-%dT%H:%M:%S)
+
+            # Delete image if it's untagged and older than the retention period
+            if [[ -n "$DIGEST" && "$TIMESTAMP" < "$CUTOFF_DATE" ]]; then
+              echo "Deleting untagged image with digest: $DIGEST"
+              gcloud artifacts docker images delete europe-west4-docker.pkg.dev/mlops-448109/mlops-artifact-registry@${DIGEST} --quiet
+            fi
+          done
 
       # Build and push the model image
       - name: Build and Push Model Image
