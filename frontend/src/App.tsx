@@ -19,6 +19,9 @@ interface CombinedData {
   close?: number;
 }
 
+const apiKey = import.meta.env.VITE_ALPHAVANTAGE_API_KEY || 'your-default-api-key';
+const api_url = window.location.origin;
+
 function App() {
   const [searchTerm, setSearchTerm] = useState('');
   const [combinedData, setCombinedData] = useState<CombinedData[]>([]);
@@ -69,7 +72,7 @@ function App() {
     
     try {
       // Fetch sentiment data
-      const sentimentResponse = await axios.get(`http://127.0.0.1:8000/get_average_sentiment?search_term=${searchTerm}`);
+      const sentimentResponse = await axios.get(`${api_url}/get_average_sentiment?search_term=${searchTerm}`);
       const sentimentData: SentimentData[] = sentimentResponse.data;
 
       // Get date range from sentiment data
@@ -79,7 +82,7 @@ function App() {
 
       // Fetch stock data from Alpha Vantage using environment variable
       const stockResponse = await axios.get(
-        `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${searchTerm}&apikey=${import.meta.env.VITE_ALPHAVANTAGE_API_KEY}`
+        `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${searchTerm}&apikey=${apiKey}`
       );
 
       const timeSeriesData = stockResponse.data['Time Series (Daily)'];
