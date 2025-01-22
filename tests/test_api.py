@@ -11,7 +11,7 @@ def test_analyze_sentiment():
     assert response.json()[0] == 'POSITIVE'
 
 def test_get_last_month_posts():
-    response = test_client.get("/get_last_month_posts?search_term=GameStop&subreddit=wallstreetbets")
+    response = test_client.get("/get_posts?search_term=GameStop&subreddit=wallstreetbets")
     assert response.status_code == 200
     assert len(response.json()) > 0
     assert 'title' in response.json()[0]

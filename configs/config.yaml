@@ -1,16 +1,18 @@
 
 model:
-  batch_size: 32
+  batch_size: 48
 
 train:
     seed: 42
     max_length: 128
-    train_split: 0.01
-    batch_size: 32
+    train_split: 0.9
+    batch_size: 48
+    lr: 6.668800023514091e-05
+    l2: 0.0006952061798051868
     lr_min: 1e-7            # Minimum learning rate for tuning
     lr_max: 1e-3            # Maximum learning rate for tuning
     l2_min: 1e-6            # Minimum L2 regularization for tuning
     l2_max: 1e-3
-    optuna_epoch: 3
+    optuna_epoch: 5
     final_epoch: 5
-    n_trials: 1
+    n_trials: 20

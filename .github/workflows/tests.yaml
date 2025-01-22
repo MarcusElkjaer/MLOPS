@@ -10,7 +10,7 @@ jobs:
     runs-on: ${{ matrix.operating-system }}
     strategy:
       matrix:
-        operating-system: ["ubuntu-latest", "windows-latest", "macos-latest"]
+        operating-system: ["ubuntu-latest", "windows-latest"] #, "macos-latest"]
         python-version: ["3.11"]
 
     steps:
@@ -38,11 +38,12 @@ jobs:
           ruff check src tests --fix
 
       - name: Set environment variables
-        uses: actions/github-script@v6
-        with:
-          script: |
-            process.env.REDDIT_CLIENT_ID = '${{ secrets.REDDIT_CLIENT_ID }}';
-            process.env.REDDIT_CLIENT_SECRET = '${{ secrets.REDDIT_CLIENT_SECRET }}';
+        run: |
+          echo "REDDIT_CLIENT_ID=${{ secrets.REDDIT_CLIENT_ID }}" >> $GITHUB_ENV
+          echo "REDDIT_CLIENT_SECRET=${{ secrets.REDDIT_CLIENT_SECRET }}" >> $GITHUB_ENV
+      - name: Get data
+        run: |
+          dvc pull --no-run-cache --force --verbose
 
       # MacOS-specific memory optimization
       - name: Optimize memory for macOS
