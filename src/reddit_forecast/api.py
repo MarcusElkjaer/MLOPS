@@ -44,13 +44,11 @@ reddit = praw.Reddit(
     user_agent= "reddit_forecast"
 )
 
-def get_last_month_posts(subreddit_name: str, search_term: str):
+def get_posts(subreddit_name: str, search_term: str, time = datetime.now() - timedelta(days=30)):
     subreddit = reddit.subreddit(subreddit_name)
-    one_month_ago = datetime.now() - timedelta(days=30)
     posts = []
-
     for submission in subreddit.search(search_term, sort='new', time_filter='month'):
-        if datetime.fromtimestamp(submission.created_utc) >= one_month_ago:
+        if datetime.fromtimestamp(submission.created_utc) >= time:
             posts.append({
                 'title': submission.title,
                 'url': submission.url,
@@ -97,15 +95,15 @@ def read_root():
 def analyze_sentiment(text: str):
     return analyze_sentiment_batch([text])[0]
 
-@app.get("/get_last_month_posts")
-def get_last_month_posts_endpoint(search_term: str, subreddit: str = "wallstreetbets"):
-    posts = get_last_month_posts(subreddit, search_term)
+@app.get("/get_posts")
+def get_posts_endpoint(search_term: str, subreddit: str = "wallstreetbets"):
+    posts = get_posts(subreddit, search_term)
     posts_with_sentiment = analyze_posts_sentiment(posts)
     return posts_with_sentiment
 
 @app.get("/get_average_sentiment")
 def get_average_sentiment_endpoint(search_term: str, subreddit: str = "wallstreetbets"):
-    posts = get_last_month_posts(subreddit, search_term)
+    posts = get_posts(subreddit, search_term)
     posts_with_sentiment = analyze_posts_sentiment(posts)
     average_sentiment = calculate_average_sentiment(posts_with_sentiment)
     return average_sentiment
