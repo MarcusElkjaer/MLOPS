@@ -43,7 +43,7 @@ jobs:
           echo "REDDIT_CLIENT_SECRET=${{ secrets.REDDIT_CLIENT_SECRET }}" >> $GITHUB_ENV
       - name: Get data
         run: |
-          dvc pull
+          dvc pull --no-run-cache --force --verbose
 
       # MacOS-specific memory optimization
       - name: Optimize memory for macOS
