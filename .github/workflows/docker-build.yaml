@@ -37,18 +37,19 @@ jobs:
       - name: Cleanup Untagged Images
         run: |
           echo "Fetching untagged images..."
-          gcloud artifacts docker images list europe-west4-docker.pkg.dev/mlops-448109/mlops-artifact-registry \
-            --filter="tags: -tags:*" \
-            --format="value(name, digest)" | while read -r line; do
-            
-            IMAGE=$(echo $line | awk '{print $1}')
-            DIGEST=$(echo $line | awk '{print $2}')
-            
-            if [[ -n "$DIGEST" ]]; then
-              echo "Deleting untagged image: ${IMAGE}@${DIGEST}"
-              gcloud artifacts docker images delete "${IMAGE}@${DIGEST}" --quiet --delete-tags
-            fi
+          gcloud artifacts docker images list \
+              europe-west4-docker.pkg.dev/mlops-448109/mlops-artifact-registry \
+              --format="json" | jq -r '.[] | select(.tags == "") | .metadata.name' | while read -r image; do
+
+              # Extract the repository and digest
+              CLEANED_IMAGE=$(echo "$image" | sed 's|projects/mlops-448109/locations/europe-west4/repositories/mlops-artifact-registry/dockerImages/|europe-west4-docker.pkg.dev/mlops-448109/mlops-artifact-registry/|')
+
+              echo "Deleting untagged image: $CLEANED_IMAGE"
+
+              # Delete the untagged image without affecting other tags
+              gcloud artifacts docker images delete "$CLEANED_IMAGE" --quiet
           done
+
 
       # Step 5: Build and push the Docker image
       - name: Build and Push Model Image
@@ -69,7 +70,7 @@ jobs:
             --image europe-west4-docker.pkg.dev/mlops-448109/mlops-artifact-registry/reddit_forecast_model:latest \
             --platform managed \
             --region europe-west4 \
-            --port 8080 \
+            --port 8000 \
             --memory 4Gi \
             --allow-unauthenticated
 
