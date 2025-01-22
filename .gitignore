@@ -334,6 +334,7 @@ ENV/
 env.bak/
 venv.bak/
 myenv/
+outputs/
 
 # Spyder project settings
 .spyderproject

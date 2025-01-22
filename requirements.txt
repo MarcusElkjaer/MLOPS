@@ -30,3 +30,6 @@ httpx
 praw
 pytorch-lightning
 optuna
+scikit-learn==1.6.1
+hydra-core==1.3.2
+google-cloud-storage

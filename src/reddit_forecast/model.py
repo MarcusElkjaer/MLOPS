@@ -3,6 +3,7 @@ import pandas as pd
 from transformers import pipeline
 import logging
 from typing import Tuple,Optional
+import hydra
 
 
 # Set up logging
@@ -28,8 +29,8 @@ def analyze_sentiment_batch(texts: list[str]) -> list[Tuple[Optional[str], Optio
         results = [(None, None)] * len(texts)
     return results
 
-
-def apply_sentiment_analysis(input_path: str, output_path: str) -> None:
+@hydra.main(config_path="../../configs", config_name="config.yaml")
+def apply_sentiment_analysis(input_path: str, output_path: str, cfg) -> None:
     """Apply sentiment analysis to preprocessed data."""
     df = pd.read_csv(input_path)
 
@@ -38,7 +39,7 @@ def apply_sentiment_analysis(input_path: str, output_path: str) -> None:
     df = df[df["text"].apply(lambda x: isinstance(x, str) and len(x.strip()) > 0)]
 
     # Process in batches
-    batch_size = 32
+    batch_size = cfg.model.batch_size
     sentiments = []
     for i in range(0, len(df), batch_size):
         batch_texts = df["text"].iloc[i:i + batch_size].tolist()

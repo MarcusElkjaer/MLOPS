@@ -113,7 +113,7 @@ if __name__ == "__main__":
 
     # Run DVC pull
     print("Running DVC pull to fetch data...")
-    subprocess.run(["dvc", "pull"], check=True)
+    subprocess.run(["dvc", "pull", "--force"], check=True)
     print("DVC pull completed.")
     dataset = "justinmiller/reddit-pennystock-data"
     raw_data_path: str = Path("data/raw")
