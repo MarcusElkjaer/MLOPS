@@ -2,7 +2,7 @@ from typing import Tuple
 import pandas as pd
 from transformers import pipeline
 import logging
-from typing import Tuple,Optional
+from typing import Tuple, Optional
 import hydra
 
 
@@ -13,25 +13,29 @@ logger = logging.getLogger(__name__)
 
 # Initialize the sentiment analysis pipeline
 sentiment_analyzer = pipeline(
-    "sentiment-analysis", 
-    model="distilbert-base-uncased-finetuned-sst-2-english")
+    "sentiment-analysis", model="distilbert-base-uncased-finetuned-sst-2-english"
+)
 
 
-def analyze_sentiment_batch(texts: list[str]) -> list[Tuple[Optional[str], Optional[float]]]:
+def analyze_sentiment_batch(
+    texts: list[str],
+) -> list[Tuple[Optional[str], Optional[float]]]:
     """Analyze sentiment for a batch of texts."""
     results = []
     try:
         responses = sentiment_analyzer(texts, truncation=True, padding=True)
         for response in responses:
-            results.append((response['label'], response['score']))
+            results.append((response["label"], response["score"]))
     except Exception as e:
         logger.error(f"Failed to analyze sentiment for batch. Error: {e}")
         results = [(None, None)] * len(texts)
     return results
 
-@hydra.main(config_path="../../configs", config_name="config.yaml")
-def apply_sentiment_analysis(input_path: str, output_path: str, cfg) -> None:
-    """Apply sentiment analysis to preprocessed data."""
+
+# In reddit_forecast/model.py
+
+
+def run_sentiment_analysis(input_path: str, output_path: str, batch_size: int) -> None:
     df = pd.read_csv(input_path)
 
     # Drop rows with missing or invalid text
@@ -39,19 +43,22 @@ def apply_sentiment_analysis(input_path: str, output_path: str, cfg) -> None:
     df = df[df["text"].apply(lambda x: isinstance(x, str) and len(x.strip()) > 0)]
 
     # Process in batches
-    batch_size = cfg.model.batch_size
     sentiments = []
     for i in range(0, len(df), batch_size):
-        batch_texts = df["text"].iloc[i:i + batch_size].tolist()
+        batch_texts = df["text"].iloc[i : i + batch_size].tolist()
         sentiments.extend(analyze_sentiment_batch(batch_texts))
 
-    # Add sentiment and sentiment score
+    # Add sentiment and sentiment score columns
     df[["sentiment", "sentiment_score"]] = pd.DataFrame(sentiments)
 
-    # Save cleaned and processed data
+    # Save the processed data
     df.to_csv(output_path, index=False)
     logger.info(f"Processed data saved to: {output_path}")
 
+
+@hydra.main(config_path="../../configs", config_name="config.yaml")
+def apply_sentiment_analysis(input_path: str, output_path: str, cfg) -> None:
+    run_sentiment_analysis(input_path, output_path, cfg.model.batch_size)
 
 
 if __name__ == "__main__":
