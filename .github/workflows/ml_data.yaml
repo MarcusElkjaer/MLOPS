@@ -2,12 +2,11 @@ name: Data Statistics Workflow
 
 on:
   push:
-    paths:
-      - 'data/**'
+    branches:
+      - main
   pull_request:
-    paths:
-      - 'data/**'
-
+    branches:
+      - main
 jobs:
   data-statistics:
     runs-on: ubuntu-latest
