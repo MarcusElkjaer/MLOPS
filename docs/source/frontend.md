@@ -17,7 +17,7 @@ The graphs show the latest months stock price and the average sentiment for the 
 
 ## Datadrift report
 To acces the data drift report go to /report.
-The report compares reference data that is pulled at the time of running, with evaluation data for the report. Both datasets are from the r/RobinHoodPennyStocks subreddit.
+The report compares reference data that is pulled at the time of running, with evaluation data for the model. Both datasets are from the r/RobinHoodPennyStocks subreddit.
 If you wish to regenerate the report run:
 ```
 python -m reddit_forecast.data_drift
