@@ -39,18 +39,21 @@ test_client = TestClient(app)
 
 
 
-# Initialize the Reddit client
-reddit = praw.Reddit(
-    client_id=os.getenv('REDDIT_CLIENT_ID'),
-    client_secret=os.getenv('REDDIT_CLIENT_SECRET'),
-    user_agent= "reddit_forecast"
-)
 
-def get_posts(subreddit_name: str, search_term: str, time = datetime.now() - timedelta(days=30)):
+
+def get_posts(subreddit_name: str, search_term: str, time = (datetime.now() - timedelta(days=30), datetime.now())):
+    load_dotenv()
+    # Initialize the Reddit client
+    reddit = praw.Reddit(
+        client_id=os.getenv('REDDIT_CLIENT_ID'),
+        client_secret=os.getenv('REDDIT_CLIENT_SECRET'),
+        user_agent= "reddit_forecast"
+    )
+    
     subreddit = reddit.subreddit(subreddit_name)
     posts = []
     for submission in subreddit.search(search_term, sort='new', time_filter='month'):
-        if datetime.fromtimestamp(submission.created_utc) >= time:
+        if time[1] >= datetime.fromtimestamp(submission.created_utc) >= time[0]:
             posts.append({
                 'title': submission.title,
                 'url': submission.url,
