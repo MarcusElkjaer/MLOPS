@@ -1,18 +1,17 @@
 steps:
-  # Step 1: Build the Docker image
   - name: 'gcr.io/cloud-builders/docker'
     args: [
       'build',
       '-t', 'gcr.io/mlops-448109/my-app:$COMMIT_SHA',
       '.'
     ]
-
-  # Step 2: Push the Docker image to Container Registry
   - name: 'gcr.io/cloud-builders/docker'
     args: [
       'push', 'gcr.io/mlops-448109/my-app:$COMMIT_SHA'
     ]
 
 images:
-  # List of images to output (so they appear in the "Build Artifacts" section)
   - 'gcr.io/mlops-448109/my-app:$COMMIT_SHA'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
