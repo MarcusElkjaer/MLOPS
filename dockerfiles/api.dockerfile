@@ -31,5 +31,7 @@ EXPOSE 8000
 
 # Start both the backend and frontend
 CMD ["sh", "-c", "uvicorn reddit_forecast.api:app --host 0.0.0.0 --port 8000"]
+# generate datadrift report
+CMD ["sh", "-c", "python -m reddit_forecast.data_drift"]
 
 

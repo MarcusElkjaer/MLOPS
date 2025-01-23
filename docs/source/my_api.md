@@ -2,6 +2,13 @@
 
 This section provides detailed information about the API endpoints available in the Reddit Forecast project.
 
+## How to run
+Uvicorn is used to serve both the frontend and the api
+It can be run simply with the following cmd, after installing requirements.
+```
+uvicorn reddit_forecast.api:app --reload --port 8000
+```
+
 ## Endpoints
 
 ### Analyze Sentiment
