@@ -11,6 +11,8 @@ from collections import defaultdict
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.requests import Request
+import asyncio
+from fastapi.responses import HTMLResponse
 
 # Load environment variables from .env file
 load_dotenv()
@@ -38,7 +40,25 @@ app.add_middleware(
 test_client = TestClient(app)
 
 
-
+def get_latest(subreddit_name: str):
+    load_dotenv()
+    # Initialize the Reddit client
+    reddit = praw.Reddit(
+        client_id=os.getenv('REDDIT_CLIENT_ID'),
+        client_secret=os.getenv('REDDIT_CLIENT_SECRET'),
+        user_agent= "reddit_forecast"
+    )
+    posts = []
+    for submission in reddit.subreddit(subreddit_name).hot(limit=100):
+        posts.append({
+            'title': submission.title,
+            'url': submission.url,
+            'created_date': datetime.fromtimestamp(submission.created_utc).strftime('%Y-%m-%d'),
+            'score': submission.score,
+            'num_comments': submission.num_comments,
+            'selftext': submission.selftext  # Fetch the text body of the post
+        })
+    return posts
 
 
 def get_posts(subreddit_name: str, search_term: str, time = (datetime.now() - timedelta(days=30), datetime.now())):
@@ -113,7 +133,20 @@ def get_average_sentiment_endpoint(search_term: str, subreddit: str = "wallstree
     average_sentiment = calculate_average_sentiment(posts_with_sentiment)
     return average_sentiment
 
+from reddit_forecast.data_drift import calculate_data_drift
+@app.get("/report", response_class=HTMLResponse)
+async def get_report():
+    #check if reports exists
+    if not os.path.exists("monitoring.html"):
+        #call asynccronous function
+        calculate_data_drift()
+    #load the data from the file "monitoring.html"
+    with open("monitoring.html", "r", encoding="utf-8") as f:
+        html_content = f.read()
+    return HTMLResponse(content=html_content, status_code=200)
+    #return HTMLResponse(content="Hello", status_code=200)
 
+#this must be at button or it will overide subsequent paths 
 #code to server the react app in frontend/dist/index.html
 app.mount("/", StaticFiles(directory="frontend/dist", html=True), name="static")
 templates = Jinja2Templates(directory="frontend/dist")
@@ -122,3 +155,4 @@ def read_root(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
 # run with: uvicorn reddit_forecast.api:app --reload --port 8000
+
