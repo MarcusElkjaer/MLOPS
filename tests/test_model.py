@@ -68,6 +68,10 @@ def test_apply_sentiment_analysis():
     # Build a test config just like Hydra would:
     from omegaconf import OmegaConf
 
+    input_path = "input.csv"
+    output_path = "test_outputs/output.csv"
+
+    # Build your config
     test_cfg = OmegaConf.create(
         {
             "model": {
