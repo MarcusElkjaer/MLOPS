@@ -22,3 +22,4 @@ plugins:
 nav:
   - Home: index.md
   - API Documentation: my_api.md
+  - Data: data.md
