@@ -33,13 +33,15 @@ Reddit Forecast is a tool designed to analyze Reddit posts, perform sentiment an
 
 ## 🤝 People Who Helped
 
-This project is a collaborative effort. Special thanks to the following individuals for their contributions:
+This project is a collaborative effort. Here are the people who were a part of the project
 
-- **[Your Name]**: Project lead and core developer, ensuring the project's success.
-- **[Contributor 1]**: Provided significant contributions to data preprocessing and visualization.
-- **[Contributor 2]**: Designed and fine-tuned the machine learning models.
-- **[Contributor 3]**: Implemented the API and deployment pipeline.
-- **[Contributor 4]**: Wrote and maintained project documentation.
+- **[Martin S. Jespersen]**
+- **[Lucas Sylvester]**
+- **[Lucas 2]**
+- **[Marcus Elkjær]**
+- **[Sebastian Wulf Andersen]**
+
+
 
 ## ✨ Features
 
