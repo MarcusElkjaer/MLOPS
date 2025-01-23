@@ -3,6 +3,8 @@ from torch.utils.data import DataLoader, random_split
 from transformers import AutoTokenizer, AutoModel
 import torch.nn as nn
 import pytorch_lightning as pl
+import wandb
+from pytorch_lightning.loggers import WandbLogger
 import optuna
 from optuna.storages import RDBStorage
 import pandas as pd
@@ -100,37 +102,43 @@ class SentimentRegressionModel(pl.LightningModule):
         return optimizer
 
 
-def objective(trial, train_dataset, val_dataset, cfg):
+def objective(trial, train_dataset, val_dataset):
     # Set random seed for reproducibility
-    seed_randoms(cfg)
+    seed_randoms()
 
     # Define hyperparameter search space
     model_name = "distilbert-base-uncased"
 
     # Hyperparameters to tune
-    learning_rate = trial.suggest_float(
-        "learning_rate", cfg.train.lr_min, cfg.train.lr_max, log=True
-    )
-    l2 = trial.suggest_float("l2", cfg.train.l2_min, cfg.train.l2_max, log=True)
-    batch_size = trial.suggest_categorical("batch_size", [cfg.train.batch_size])
+    learning_rate = trial.suggest_float("learning_rate", 1e-7, 1e-3, log=True)
+    l2 = trial.suggest_float("l2", 1e-7, 1e-2, log=True)
+    batch_size = trial.suggest_categorical("batch_size", [16, 32, 48])
 
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
     val_loader = DataLoader(val_dataset, batch_size=batch_size)
 
     # Initialize the model
-    model = SentimentRegressionModel(model_name, learning_rate, l2)
+    model = SentimentRegressionModel(model_name, learning_rate=learning_rate, l2=l2)
+
+    # Initialize wandb logger
+    wandb_logger = WandbLogger(
+        project="sentiment-analysis",
+        group="optuna-study",
+        config={"learning_rate": learning_rate, "l2": l2, "batch_size": batch_size},
+    )
 
     # Trainer for Optuna
     trainer = pl.Trainer(
-        max_epochs=cfg.train.optuna_epoch,
-        # accelerator="gpu" if torch.cuda.is_available() else "cpu",
-        # devices=1 if torch.cuda.is_available() else 0,
-        logger=False,
+        max_epochs=5,
+        accelerator="gpu" if torch.cuda.is_available() else "cpu",
+        devices=1 if torch.cuda.is_available() else None,
+        logger=wandb_logger,
         enable_checkpointing=False,
     )
 
     # Train the model and return the validation loss
     trainer.fit(model, train_loader, val_loader)
+    wandb.finish()
     return trainer.callback_metrics["val_loss"].item()
 
 
@@ -187,16 +195,21 @@ def main(cfg):
         model_name, learning_rate=best_params["learning_rate"], l2=best_params["l2"]
     )
 
+    wandb_logger = WandbLogger(project = "Sentiment analysis", group = "final_model")
     trainer = pl.Trainer(
         max_epochs=cfg.train.final_epoch,  # Train longer for the final model
         accelerator="gpu" if torch.cuda.is_available() else "cpu",
         devices=1 if torch.cuda.is_available() else None,
+        logger = wandb_logger,
     )
 
     trainer.fit(final_model, train_loader, val_loader)
     final_model.model.save_pretrained("models/sentiment_model_finetuned")
     final_model.tokenizer.save_pretrained("models/sentiment_model_finetuned")
+    wandb.finish()
 
 
 if __name__ == "__main__":
+    wandb.login(key=os.getenv("WANDB_API"))
+    # wandb.login()
     main()
