@@ -1,10 +1,10 @@
 name: Deploy docs
 on:
-push:
+  push:
     branches:
-        - main
+      - main
 permissions:
-    contents: write
+  contents: write
 jobs:
   deploy:
     name: Deploy docs
