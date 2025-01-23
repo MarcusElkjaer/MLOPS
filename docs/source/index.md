@@ -6,6 +6,9 @@ Welcome to the **Reddit Forecast** project documentation. This site provides com
 
 - [API Reference](my_api.md)
 - [Data](data.md)
+- [Train](train.md)
+- [Model](model.md)
+- [How to run](how_to_run.md)
 
 ## 🛠️ About the Project
 
