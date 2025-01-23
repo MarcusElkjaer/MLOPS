@@ -5,6 +5,7 @@ Welcome to the **Reddit Forecast** project documentation. This site provides com
 ## 📚 Table of Contents
 
 - [API Reference](my_api.md)
+- [Data](data.md)
 
 ## 🛠️ About the Project
 
