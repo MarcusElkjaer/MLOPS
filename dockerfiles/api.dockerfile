@@ -8,6 +8,7 @@ RUN apt update && \
 
 # Copy backend files
 COPY src src/
+COPY data data/
 COPY .env .env
 COPY requirements.txt requirements.txt
 COPY requirements_dev.txt requirements_dev.txt
@@ -29,9 +30,8 @@ RUN npm run build
 WORKDIR /
 EXPOSE 8000
 
-# Start both the backend and frontend
-CMD ["sh", "-c", "uvicorn reddit_forecast.api:app --host 0.0.0.0 --port 8000"]
-# generate datadrift report
-CMD ["sh", "-c", "python -m reddit_forecast.data_drift"]
+RUN python -m reddit_forecast.data_drift
 
+# Start both the backend and frontend and generate datadrift report
+CMD ["sh", "-c", "uvicorn reddit_forecast.api:app --host 0.0.0.0 --port 8000"]
 
