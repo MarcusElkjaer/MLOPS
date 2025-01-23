@@ -81,3 +81,4 @@ Best trial:
     learning_rate: 6.67e-05
     l2: 0.000695
     batch_size: 48
+```
