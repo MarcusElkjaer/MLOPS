@@ -6,7 +6,7 @@ on:
       - main  # Change to the branch you want to monitor
     paths:
       - model_registry/**  # Monitor specific files or directories
-
+#martin er dum
 jobs:
   trigger-cloud-build:
     runs-on: ubuntu-latest
