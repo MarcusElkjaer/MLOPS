@@ -25,6 +25,12 @@ jobs:
           python -m pip install --upgrade pip setuptools wheel
           pip install -r requirements.txt
 
+      - name: Get data
+        run: |
+          pip install dvc
+          pip install dvc-gs
+          dvc pull --no-run-cache --force --verbose
+
       - name: Run dataset statistics
         env:
           PYTHONPATH: src
