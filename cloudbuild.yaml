@@ -2,12 +2,12 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args: [
       'build',
-      '-t', 'gcr.io/mlops-448109/my-app:$COMMIT_SHA',
+      '-t', 'europe-west4-docker.pkg.dev/mlops-448109/mlops-artifact-registry/reddit_forecast_model',
       '.'
     ]
   - name: 'gcr.io/cloud-builders/docker'
     args: [
-      'push', 'gcr.io/mlops-448109/my-app:$COMMIT_SHA'
+      'push', 'europe-west4-docker.pkg.dev/mlops-448109/mlops-artifact-registry/reddit_forecast_model'
     ]
 
 images:
