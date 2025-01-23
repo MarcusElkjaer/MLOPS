@@ -5,7 +5,7 @@ This module handles data loading, preprocessing, and statistics generation for R
 ## ⚡ Key Functions
 
 ### **preprocess(raw_data_path, output_folder)**
-- **Description**: Reads a JSON file containing raw data, processes it, and outputs cleaned data as CSV files.
+- **Description**: Reads the JSON file containing raw data, processes it, and outputs cleaned data as CSV files.
 - **Inputs**:
   - `raw_data_path (Path)`: Path to the folder containing the raw JSON file (`saps.json`).
   - `output_folder (Path)`: Path to save the processed data.
