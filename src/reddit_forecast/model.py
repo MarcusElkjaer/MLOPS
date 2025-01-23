@@ -4,12 +4,14 @@ from transformers import pipeline
 import logging
 from typing import Tuple, Optional
 import hydra
+import os
+from hydra.utils import to_absolute_path
 
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-#
+
 
 # Initialize the sentiment analysis pipeline
 sentiment_analyzer = pipeline(
@@ -33,25 +35,34 @@ def analyze_sentiment_batch(
 
 
 @hydra.main(config_path="../../configs", config_name="config.yaml")
-def apply_sentiment_analysis(input_path: str, output_path: str, cfg) -> None:
-    """Apply sentiment analysis to preprocessed data."""
-    df = pd.read_csv(input_path)
+def apply_sentiment_analysis(cfg) -> None:
+    """
+    Apply sentiment analysis to preprocessed data.
+    Assumes cfg.model.input_path, cfg.model.output_path, cfg.model.batch_size exist.
+    """
+    # Read input CSV from the specified path
+    # (If your config has relative paths, you may need to convert them to absolute with to_absolute_path)
+    input_path = to_absolute_path(cfg.model.input_path)
+    output_path = (
+        cfg.model.output_path
+    )  # This can remain relative to Hydra’s run dir if you like
 
-    # Drop rows with missing or invalid text
+    df = pd.read_csv(input_path)
     df = df.dropna(subset=["text"])
     df = df[df["text"].apply(lambda x: isinstance(x, str) and len(x.strip()) > 0)]
 
-    # Process in batches
+    # Perform sentiment analysis in batches
     batch_size = cfg.model.batch_size
     sentiments = []
     for i in range(0, len(df), batch_size):
         batch_texts = df["text"].iloc[i : i + batch_size].tolist()
         sentiments.extend(analyze_sentiment_batch(batch_texts))
 
-    # Add sentiment and sentiment score
     df[["sentiment", "sentiment_score"]] = pd.DataFrame(sentiments)
 
-    # Save cleaned and processed data
+    # **Create the directory if it doesn't exist**
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+
     df.to_csv(output_path, index=False)
     logger.info(f"Processed data saved to: {output_path}")
 
@@ -59,4 +70,4 @@ def apply_sentiment_analysis(input_path: str, output_path: str, cfg) -> None:
 if __name__ == "__main__":
     input_path = "data/processed/preprocessed_data.csv"
     output_path = "models/processed_posts_with_sentiment.csv"
-    apply_sentiment_analysis(input_path, output_path)
+    apply_sentiment_analysis()
