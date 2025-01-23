@@ -65,6 +65,11 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
+        
+        <a href="#train-documentation" class="md-skip">
+          Skip to content
+        </a>
+      
     </div>
     <div data-md-component="announce">
       
@@ -276,6 +281,19 @@
       <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
       
       
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Train
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
       
       <a href="./" class="md-nav__link md-nav__link--active">
         
@@ -286,6 +304,142 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#this-project-implements-a-sentiment-regression-model-using-distilbert-for-analyzing-and-predicting-sentiment-scores-from-a-dataset-of-labeled-sentences-the-implementation-leverages-pytorch-pytorch-lightning-transformers-and-optuna-for-hyperparameter-tuning-the-data-set-that-we-are-looking-at-is-reddit-penny-stocks-found-on-kaggle" class="md-nav__link">
+    <span class="md-ellipsis">
+      This project implements a sentiment regression model using DistilBERT for analyzing and predicting sentiment scores from a dataset of labeled sentences. The implementation leverages PyTorch, PyTorch Lightning, Transformers, and Optuna for hyperparameter tuning. The data set that we are looking at is reddit penny stocks found on kaggle.
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#table-of-contents" class="md-nav__link">
+    <span class="md-ellipsis">
+      Table of Contents
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      Overview
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dataset" class="md-nav__link">
+    <span class="md-ellipsis">
+      Dataset
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#model-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      Model Architecture
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Model Architecture">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#sentiment-regression-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      Sentiment Regression Model
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#training" class="md-nav__link">
+    <span class="md-ellipsis">
+      Training
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Training">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#key-components" class="md-nav__link">
+    <span class="md-ellipsis">
+      Key Components
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#training-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      Training Steps
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hyperparameter-optimization" class="md-nav__link">
+    <span class="md-ellipsis">
+      Hyperparameter Optimization
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Hyperparameter Optimization">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#best-hyperparameters-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      Best Hyperparameters Example:
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -348,6 +502,133 @@
   
   
   
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#this-project-implements-a-sentiment-regression-model-using-distilbert-for-analyzing-and-predicting-sentiment-scores-from-a-dataset-of-labeled-sentences-the-implementation-leverages-pytorch-pytorch-lightning-transformers-and-optuna-for-hyperparameter-tuning-the-data-set-that-we-are-looking-at-is-reddit-penny-stocks-found-on-kaggle" class="md-nav__link">
+    <span class="md-ellipsis">
+      This project implements a sentiment regression model using DistilBERT for analyzing and predicting sentiment scores from a dataset of labeled sentences. The implementation leverages PyTorch, PyTorch Lightning, Transformers, and Optuna for hyperparameter tuning. The data set that we are looking at is reddit penny stocks found on kaggle.
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#table-of-contents" class="md-nav__link">
+    <span class="md-ellipsis">
+      Table of Contents
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      Overview
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dataset" class="md-nav__link">
+    <span class="md-ellipsis">
+      Dataset
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#model-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      Model Architecture
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Model Architecture">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#sentiment-regression-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      Sentiment Regression Model
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#training" class="md-nav__link">
+    <span class="md-ellipsis">
+      Training
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Training">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#key-components" class="md-nav__link">
+    <span class="md-ellipsis">
+      Key Components
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#training-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      Training Steps
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hyperparameter-optimization" class="md-nav__link">
+    <span class="md-ellipsis">
+      Hyperparameter Optimization
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Hyperparameter Optimization">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#best-hyperparameters-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      Best Hyperparameters Example:
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
   
 </nav>
                   </div>
@@ -362,9 +643,98 @@
                   
 
 
-  <h1>Train</h1>
-
-
+<h1 id="train-documentation">Train documentation</h1>
+<h2 id="this-project-implements-a-sentiment-regression-model-using-distilbert-for-analyzing-and-predicting-sentiment-scores-from-a-dataset-of-labeled-sentences-the-implementation-leverages-pytorch-pytorch-lightning-transformers-and-optuna-for-hyperparameter-tuning-the-data-set-that-we-are-looking-at-is-reddit-penny-stocks-found-on-kaggle">This project implements a sentiment regression model using <code>DistilBERT</code> for analyzing and predicting sentiment scores from a dataset of labeled sentences. The implementation leverages <code>PyTorch</code>, <code>PyTorch Lightning</code>, <code>Transformers</code>, and <code>Optuna</code> for hyperparameter tuning. The data set that we are looking at is reddit penny stocks found on kaggle.</h2>
+<h2 id="table-of-contents">Table of Contents</h2>
+<ol>
+<li><a href="#overview">Overview</a></li>
+<li><a href="#dataset">Dataset</a></li>
+<li><a href="#model-architecture">Model Architecture</a></li>
+<li><a href="#training">Training</a></li>
+<li><a href="#hyperparameter-optimization">Hyperparameter Optimization</a></li>
+</ol>
+<hr />
+<h2 id="overview">Overview</h2>
+<p>This pipeline includes the following features:
+- Data preprocessing and tokenization using <code>AutoTokenizer</code> from the Hugging Face Transformers library.
+- Sentiment regression model built on <code>DistilBERT</code>.
+- Fine-tuning using <code>PyTorch Lightning</code>.
+- Automated hyperparameter tuning with <code>Optuna</code>.
+- Configurable via <code>Hydra</code> to maintain modular and scalable configurations.</p>
+<hr />
+<h2 id="dataset">Dataset</h2>
+<p>The dataset is provided as a CSV file with the following structure:</p>
+<table>
+<thead>
+<tr>
+<th>Sentence</th>
+<th>Sentiment</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>"The stock is performing well"</td>
+<td>positive</td>
+</tr>
+<tr>
+<td>"The market looks bad today"</td>
+<td>negative</td>
+</tr>
+<tr>
+<td>"I'm neutral about this move"</td>
+<td>neutral</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>File Location</strong>: <code>data/raw/data.csv</code></li>
+<li><strong>Columns</strong>:</li>
+<li><code>Sentence</code>: The text input.</li>
+<li><code>Sentiment</code>: The sentiment label (<code>positive</code>, <code>negative</code>, <code>neutral</code>).</li>
+</ul>
+<hr />
+<h2 id="model-architecture">Model Architecture</h2>
+<h3 id="sentiment-regression-model">Sentiment Regression Model</h3>
+<ul>
+<li><strong>Base Model</strong>: <code>DistilBERT</code></li>
+<li><strong>Tokenization</strong>: Uses <code>AutoTokenizer</code> from Hugging Face to preprocess the text.</li>
+<li><strong>Regression Head</strong>: A single fully connected layer on top of the [CLS] token representation to predict a continuous sentiment score.</li>
+<li><strong>Loss Function</strong>: Mean Squared Error (MSE).</li>
+</ul>
+<hr />
+<h2 id="training">Training</h2>
+<h3 id="key-components">Key Components</h3>
+<ul>
+<li><strong>Training Split</strong>: The dataset is split into training and validation sets based on <code>train_split</code> in the configuration.</li>
+<li><strong>Optimizer</strong>: <code>AdamW</code> with configurable learning rate and L2 regularization.</li>
+<li><strong>Trainer</strong>: <code>PyTorch Lightning</code> handles the training and validation loops.</li>
+</ul>
+<h3 id="training-steps">Training Steps</h3>
+<ol>
+<li><strong>Load Dataset</strong>: Read the CSV file and preprocess sentences using the tokenizer.</li>
+<li><strong>Dataset Splitting</strong>: Split the dataset into training and validation sets.</li>
+<li><strong>Model Training</strong>: Train the model using the configured optimizer and loss function.</li>
+</ol>
+<hr />
+<h2 id="hyperparameter-optimization">Hyperparameter Optimization</h2>
+<ul>
+<li><strong>Framework</strong>: <code>Optuna</code> is used for hyperparameter tuning.</li>
+<li><strong>Optimization Goals</strong>: Minimize the validation loss.</li>
+<li><strong>Tunable Parameters</strong>:</li>
+<li>Learning Rate (<code>lr_min</code> to <code>lr_max</code>).</li>
+<li>L2 Regularization (<code>l2_min</code> to <code>l2_max</code>).</li>
+<li>Batch Size.</li>
+<li><strong>Number of Trials</strong>: <code>n_trials</code> as specified in the configuration.</li>
+<li><strong>Storage</strong>: Results are stored in <code>optuna_study.db</code> using SQLite.</li>
+</ul>
+<h3 id="best-hyperparameters-example">Best Hyperparameters Example:</h3>
+<p>```text
+Best trial:
+  Value: 0.01234
+  Params:
+    learning_rate: 6.67e-05
+    l2: 0.000695
+    batch_size: 48</p>
 
 
 
