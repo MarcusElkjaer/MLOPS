@@ -21,3 +21,8 @@ def test_get_last_month_posts():
     assert 'num_comments' in response.json()[0]
     assert 'selftext' in response.json()[0]
     assert 'sentiment' in response.json()[0]
+
+def test_data_drift():
+    response = test_client.get("/report")
+    assert response.status_code == 200
+    assert len(response.text) > 0
