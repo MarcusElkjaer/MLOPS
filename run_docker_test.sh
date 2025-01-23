@@ -1,51 +1,25 @@
-#!/bin/bash
+echo "Fetching untagged images..."
+# Filter images with empty tags
+UNTAGGED_IMAGES=$(gcloud artifacts docker images list \
+    europe-west4-docker.pkg.dev/mlops-448109/mlops-artifact-registry \
+    --format="json" | jq -r '.[] | select(.tags == "") | .metadata.name')
 
-# Configuration variables
-REGISTRY="europe-west4-docker.pkg.dev"
-PROJECT_ID="mlops-448109"
-REPOSITORY="mlops-artifact-registry"
-IMAGE_NAME="reddit_forecast_model" # Replace with your image name
-TAG="latest"        # Replace with your desired tag, e.g., latest
-LOCAL_PORT=8000     # Port on your local machine
-CONTAINER_PORT=8000 # Port the application listens to in the container
-
-# Authenticate Docker with Artifact Registry
-echo "Authenticating Docker with Google Artifact Registry..."
-gcloud auth configure-docker $REGISTRY
-
-# Pull the latest image
-echo "Pulling the latest image from $REGISTRY/$PROJECT_ID/$REPOSITORY/$IMAGE_NAME:$TAG..."
-docker pull $REGISTRY/$PROJECT_ID/$REPOSITORY/$IMAGE_NAME:$TAG
-
-# Run the container
-echo "Running the container..."
-CONTAINER_ID=$(docker run -d -p $LOCAL_PORT:$CONTAINER_PORT $REGISTRY/$PROJECT_ID/$REPOSITORY/$IMAGE_NAME:$TAG)
-
-# Wait for the container to be ready
-echo "Waiting for the container to bind to port $LOCAL_PORT..."
-MAX_RETRIES=30
-RETRY_COUNT=0
-while [[ $RETRY_COUNT -lt $MAX_RETRIES ]]; do
-  # Check if the port is being used
-  if lsof -i TCP:$LOCAL_PORT | grep LISTEN > /dev/null; then
-    echo "Application is up and running at http://localhost:$LOCAL_PORT"
-    break
-  fi
-  RETRY_COUNT=$((RETRY_COUNT + 1))
-  echo "Waiting for the application... (retry $RETRY_COUNT/$MAX_RETRIES)"
-  sleep 2
-done
-
-# If the app doesn't start, exit with an error
-if [[ $RETRY_COUNT -eq $MAX_RETRIES ]]; then
-  echo "Application did not start within the expected time. Check the container logs for issues."
-  echo "Fetching logs for container $CONTAINER_ID:"
-  docker logs $CONTAINER_ID
-  exit 1
+if [ -z "$UNTAGGED_IMAGES" ]; then
+  echo "No untagged images found."
+  exit 0
 fi
 
-# Verify the container is running
-echo "Checking running containers..."
-docker ps
+echo "Found untagged images:"
+echo "$UNTAGGED_IMAGES"
 
-echo "Container is running. Access it at http://localhost:$LOCAL_PORT"
+echo "$UNTAGGED_IMAGES" | while read -r image; do
+  # Convert the metadata.name field into the full image path
+  CLEANED_IMAGE=$(echo "$image" | sed 's|projects/mlops-448109/locations/europe-west4/repositories/mlops-artifact-registry/dockerImages/|europe-west4-docker.pkg.dev/mlops-448109/mlops-artifact-registry/|')
+
+  echo "Attempting to delete untagged image: $CLEANED_IMAGE"
+
+  # Attempt to delete the untagged image
+  if ! gcloud artifacts docker images delete "$CLEANED_IMAGE" --quiet; then
+    echo "Warning: Failed to delete image $CLEANED_IMAGE. Skipping..."
+  fi
+done
