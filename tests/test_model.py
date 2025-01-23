@@ -62,18 +62,31 @@ def test_apply_sentiment_analysis():
     input_df.to_csv(input_path, index=False)
 
     mock_analyze_sentiment_batch = MagicMock(
-        return_value=[
-            ("POSITIVE", 0.99),
-            ("NEGATIVE", 0.88),
-        ]
+        return_value=[("POSITIVE", 0.99), ("NEGATIVE", 0.88)]
     )
+
+    # Build a test config just like Hydra would:
+    from omegaconf import OmegaConf
+
+    test_cfg = OmegaConf.create(
+        {
+            "model": {
+                "input_path": input_path,
+                "output_path": output_path,
+                "batch_size": 32,
+            }
+        }
+    )
+
     with patch(
         "reddit_forecast.model.analyze_sentiment_batch", mock_analyze_sentiment_batch
     ):
         from reddit_forecast.model import apply_sentiment_analysis
 
-        apply_sentiment_analysis(input_path, output_path)
+        # Pass the config object (Hydra style) instead of two separate arguments:
+        apply_sentiment_analysis(test_cfg)
 
+        # Verify output
         result_df = pd.read_csv(output_path)
         assert "sentiment" in result_df.columns
         assert "sentiment_score" in result_df.columns
