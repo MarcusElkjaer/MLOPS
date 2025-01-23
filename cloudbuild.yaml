@@ -2,8 +2,10 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args: [
       'build',
+      '.'
       '-t', 'europe-west4-docker.pkg.dev/mlops-448109/mlops-artifact-registry/reddit_forecast_model',
-      'dockerfiles/'
+      'f',
+      'dockerfiles/api.dockerfile'
     ]
   - name: 'gcr.io/cloud-builders/docker'
     args: [
