@@ -131,7 +131,7 @@ def objective(trial, train_dataset, val_dataset, cfg):
     trainer = pl.Trainer(
         max_epochs=5,
         accelerator="gpu" if torch.cuda.is_available() else "cpu",
-        devices=1 if torch.cuda.is_available() else None,
+        devices=1,
         logger=wandb_logger,
         enable_checkpointing=False,
     )
