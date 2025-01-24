@@ -15,7 +15,8 @@ COPY README.md README.md
 COPY pyproject.toml pyproject.toml
 
 # Install Python dependencies
-RUN --mount=type=cache,target=~/pip/.cache pip install -r requirements.txt
+# --mount=type=cache,target=~/pip/.cache Removed from line below
+RUN pip install -r requirements.txt
 #RUN pip install -r requirements.txt --no-cache-dir --verbose
 RUN pip install . --no-deps --no-cache-dir --verbose
 
