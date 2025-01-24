@@ -104,7 +104,7 @@ class SentimentRegressionModel(pl.LightningModule):
 
 def objective(trial, train_dataset, val_dataset, cfg):
     # Set random seed for reproducibility
-    seed_randoms()
+    seed_randoms(cfg)
 
     # Define hyperparameter search space
     model_name = "distilbert-base-uncased"
