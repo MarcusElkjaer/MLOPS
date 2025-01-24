@@ -1,12 +1,12 @@
 steps:
 
   - name: 'python:3.9'
-      entrypoint: /bin/bash
-      args:
-        - '-c'
-        - |
-          pip install --no-cache-dir dvc dvc-gs
-          dvc pull
+    entrypoint: /bin/bash
+    args:
+      - '-c'
+      - |
+        pip install --no-cache-dir dvc dvc-gs
+        dvc pull
 
   - name: 'gcr.io/cloud-builders/docker'
     args: [
