@@ -102,7 +102,7 @@ class SentimentRegressionModel(pl.LightningModule):
         return optimizer
 
 
-def objective(trial, train_dataset, val_dataset):
+def objective(trial, train_dataset, val_dataset, cfg):
     # Set random seed for reproducibility
     seed_randoms()
 
