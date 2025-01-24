@@ -9,6 +9,7 @@ RUN apt update && \
 # Copy backend files
 COPY src src/
 COPY data data/
+COPY .env .env
 COPY requirements.txt requirements.txt
 COPY requirements_dev.txt requirements_dev.txt
 COPY README.md README.md
