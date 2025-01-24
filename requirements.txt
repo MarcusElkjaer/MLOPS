@@ -36,3 +36,6 @@ google-cloud-storage
 evidently
 dvc
 dvc-gs
+mkdocs-material
+mkdocstrings
+wandb

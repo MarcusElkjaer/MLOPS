@@ -37,7 +37,7 @@ jobs:
           python -c "from reddit_forecast.data import dataset_statistics; from pathlib import Path; dataset_statistics(Path('data/processed'))"
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: dataset-statistics
           path: data/processed/statistics_report.md
