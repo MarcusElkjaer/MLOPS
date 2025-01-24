@@ -20,16 +20,6 @@ jobs:
         with:
           credentials_json: ${{ secrets.GCP_CREDENTIALS }}  # Add this secret to your repository
 
-      - name: Download Secret File
-        id: download-secret
-        uses: google-github-actions/get-secretmanager-secrets@v1
-        with:
-          secrets: |
-            my-secret:projects/579403182821/secrets/env-file/versions/1 # Replace with your secret details
-
-      - name: Save Secret to File
-        run: echo "${{ steps.download-secret.outputs['my-secret'] }}" > .env  # Replace with your desired file path
-
       - name: Trigger Cloud Build
         id: trigger
         uses: google-github-actions/deploy-cloud-build@v0
