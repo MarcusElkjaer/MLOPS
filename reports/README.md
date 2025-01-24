@@ -801,10 +801,7 @@ Student s224743 was in charge of developing, tests and coverage for the codebase
 Student s224803 was in charge of developing, Set up logging, implemented unit testing in different files, made github action workflows for different parts of the application, set up docker files, set up profiling to optimize application  
 Student s214625 was in charge of setting up the models and the training environment to work on HPC and google cloud, as well as WandB with optuna to log our experiments.
 Student s224751 was in charge of developing, Set up workflows for Docker and the API so they can run in the cloud. I also helped set up Compute Engine instances to enable running training in the cloud. Additionally, I set up a Cloud Storage bucket. I’ve made stress tests for the frontend as well. Furthermore, I set up the project in GCP and managed the billing to keep it under control.
-
-
-Student s214636 was in charge of developing, 
-
+I (student s214536) was in charge of developing the API and accompanying tests for the API. I also made the front end for the API react/node.js.  I made docker files for the API/frontend to deploy quickly along with Google Cloud and GitHub secrets for external APIs. API integration with Reddit API to fetch current data and stock API to get live stock prices. I also made the data drifting setup and integration with the API to generate and view the report in the frontend. I also set up dvc so we could pull/push data we used to the Cloud Storage bucket(along with s224751). I did significant work on getting workflows to work both testing and building the docker images.
 
 We have used ChatGPT to help debug our code and to better understand how to use the different tools. This was done because we realized that some of the documentation on the course page was very outdated in some cases. Additionally, we used GitHub Copilot to help write some of our code.
 
