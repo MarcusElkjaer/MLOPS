@@ -2,18 +2,16 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args: [
       'build',
+      '-f', 'dockerfiles/api.dockerfile',
       '-t', 'europe-west4-docker.pkg.dev/mlops-448109/mlops-artifact-registry/reddit_forecast_model',
-      'dockerfiles/'
+      '.'
+      
     ]
   - name: 'gcr.io/cloud-builders/docker'
     args: [
       'push', 'europe-west4-docker.pkg.dev/mlops-448109/mlops-artifact-registry/reddit_forecast_model'
     ]
 
-images:
-  - 'gcr.io/mlops-448109/my-app:$COMMIT_SHA'
-
 options:
   logging: CLOUD_LOGGING_ONLY
 
-#hye
