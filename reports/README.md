@@ -409,7 +409,7 @@ Plotting the validation loss over our epochs, we see that the models tend to fit
 
 Performing a hyperparameter sweep in optuna and logging the results to WANDB, we can log the experiments that we performed.
 
-![this figure](figures/Parralelplot.png)
+![this figure](figures/Parrelelplot.png)
 
 
 From the parallel coordinates of the hyperparameter sweep, we can observe that a lower batch size and l2 penalty, and a learning rate of around 2e-5 tends to yield the best results. The best trial had a validation loss of around 0.0515.
