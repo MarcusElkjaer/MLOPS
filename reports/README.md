@@ -407,6 +407,17 @@ Plotting the validation loss over our epochs, we see that the models tend to fit
 
 --- question 14 fill here ---
 
+Performing a hyperparameter sweep in optuna and logging the results to WANDB, we can log the experiments that we performed.
+
+[this figure](figures/Parralelplot.png)
+
+From the parallel coordinates of the hyperparameter sweep, we can observe that a lower batch size and l2 penalty, and a learning rate of around 2e-5 tends to yield the best results. The best trial had a validation loss of around 0.0515.
+
+[this figure](figures/val_loss.png)
+
+Plotting the validation loss over our epochs, we see that the models tend to fit quite quickly, likely as a result of using BERT as a base model and training from there. 
+
+
 ### Question 15
 
 
@@ -787,7 +798,7 @@ Since all our changes were pushed directly to the main branch, every commit trig
 > Answer:
 Student s224743 was in charge of developing, tests and coverage for the codebase, setting up  hydra to manage hyperparameters, made a github workflow for the application and set up our cloud trigger for the artifacts.
 Student s224803 was in charge of developing, Set up logging, implemented unit testing in different files, made github action workflows for different parts of the application, set up docker files, set up profiling to optimize application  
-Student s214625 was in charge of developing
+Student s214625 was in charge of setting up the models and the training environment to work on HPC and google cloud, as well as WandB with optuna to log our experiments.
 Student s224751 was in charge of developing, Set up workflows for Docker and the API so they can run in the cloud. I also helped set up Compute Engine instances to enable running training in the cloud. Additionally, I set up a Cloud Storage bucket. I’ve made stress tests for the frontend as well. Furthermore, I set up the project in GCP and managed the billing to keep it under control.
 
 
