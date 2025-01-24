@@ -30,7 +30,7 @@ RUN npm run build
 WORKDIR /
 EXPOSE 8000
 
-#RUN python -m reddit_forecast.data_drift
+RUN python -m reddit_forecast.data_drift
 
 # Start both the backend and frontend and generate datadrift report
 CMD ["sh", "-c", "uvicorn reddit_forecast.api:app --host 0.0.0.0 --port 8000"]
