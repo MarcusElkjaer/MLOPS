@@ -15,11 +15,16 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCP_CREDENTIALS }}  # Add this secret to your repository
+
       - name: Trigger Cloud Build
         id: trigger
         uses: google-github-actions/deploy-cloud-build@v0
         with:
           project_id: mlops-448109  # Your GCP project ID
-          trigger_id: your-trigger-id  # Replace with the actual trigger ID from Cloud Build
+          trigger_id: 4ad25995-764c-4890-9e73-d8b3fa224bd9  # Replace with the actual trigger ID from Cloud Build
           substitutions: |
             _MODEL_NAME=model  # Optional: Add custom substitutions for your build

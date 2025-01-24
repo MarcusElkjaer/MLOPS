@@ -93,7 +93,7 @@ jobs:
             --port 8000 \
             --memory 4Gi \
             --allow-unauthenticated
-
+      
       # Step 6: Wait for the service to respond
       - name: Wait for Service to Start
         run: |
